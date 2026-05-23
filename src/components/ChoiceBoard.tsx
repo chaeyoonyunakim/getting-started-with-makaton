@@ -343,6 +343,7 @@ const ChoiceBoard = () => {
                 intent={activeCategory ? "subitem" : "category"}
                 highContrast={highContrast}
                 disabled={!!activeCategory && boardLocked}
+                predicted={!!activeCategory && predictedIds.has(sym.id)}
                 onSelect={() => {
                   if (!activeCategory) {
                     const fullCat = categories.find((c) => c.id === sym.id || c.label === sym.label);
