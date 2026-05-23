@@ -25,6 +25,7 @@ interface BoardCellProps {
   intent: BoardIntent;
   highContrast?: boolean;
   disabled?: boolean;
+  predicted?: boolean;
   onSelect: (symbol: BoardSymbol) => void;
 }
 
@@ -37,6 +38,7 @@ export const BoardCell = ({
   intent,
   highContrast,
   disabled,
+  predicted,
   onSelect,
 }: BoardCellProps) => {
   const [popping, setPopping] = useState(false);
@@ -83,6 +85,7 @@ export const BoardCell = ({
                 focus:outline-none focus:ring-4 focus:ring-ring/50
                 ${popping ? "animate-pop" : ""}
                 ${success ? "ring-4 ring-green-400" : ""}
+                ${predicted && !success ? "ring-2 ring-amber-400" : ""}
                 cursor-pointer select-none relative overflow-hidden
               `}
               aria-label={symbol.label}
