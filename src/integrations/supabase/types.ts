@@ -88,8 +88,10 @@ export type Database = {
       card_selections: {
         Row: {
           created_at: string
+          dwell_ms: number | null
           from_card_id: string | null
           id: string
+          predicted_in_top3: boolean
           pupil_id: string
           scene_id: string
           session_id: string
@@ -97,8 +99,10 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          dwell_ms?: number | null
           from_card_id?: string | null
           id?: string
+          predicted_in_top3?: boolean
           pupil_id: string
           scene_id: string
           session_id: string
@@ -106,8 +110,10 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          dwell_ms?: number | null
           from_card_id?: string | null
           id?: string
+          predicted_in_top3?: boolean
           pupil_id?: string
           scene_id?: string
           session_id?: string
@@ -133,6 +139,13 @@ export type Database = {
             columns: ["scene_id"]
             isOneToOne: false
             referencedRelation: "scenes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "card_selections_session_fk"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
             referencedColumns: ["id"]
           },
           {
@@ -182,6 +195,38 @@ export type Database = {
           symbol_url?: string | null
         }
         Relationships: []
+      }
+      org_settings: {
+        Row: {
+          org_id: string
+          retention_days: number
+          reward_min_distinct_scenes: number
+          reward_min_selections: number
+          updated_at: string
+        }
+        Insert: {
+          org_id: string
+          retention_days?: number
+          reward_min_distinct_scenes?: number
+          reward_min_selections?: number
+          updated_at?: string
+        }
+        Update: {
+          org_id?: string
+          retention_days?: number
+          reward_min_distinct_scenes?: number
+          reward_min_selections?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_settings_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: true
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       org_symbol_packs: {
         Row: {
@@ -490,6 +535,50 @@ export type Database = {
           },
         ]
       }
+      sessions: {
+        Row: {
+          depth_used: number | null
+          ended_at: string | null
+          golden_sign_awarded: boolean
+          id: string
+          pupil_id: string
+          scene_count: number
+          started_at: string
+          ta_id: string | null
+          total_selections: number
+        }
+        Insert: {
+          depth_used?: number | null
+          ended_at?: string | null
+          golden_sign_awarded?: boolean
+          id?: string
+          pupil_id: string
+          scene_count?: number
+          started_at?: string
+          ta_id?: string | null
+          total_selections?: number
+        }
+        Update: {
+          depth_used?: number | null
+          ended_at?: string | null
+          golden_sign_awarded?: boolean
+          id?: string
+          pupil_id?: string
+          scene_count?: number
+          started_at?: string
+          ta_id?: string | null
+          total_selections?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_pupil_id_fkey"
+            columns: ["pupil_id"]
+            isOneToOne: false
+            referencedRelation: "pupils"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       symbol_review_queue: {
         Row: {
           candidate_url: string
@@ -533,6 +622,64 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ta_notifications: {
+        Row: {
+          acknowledged_at: string | null
+          child_name: string
+          created_at: string
+          id: string
+          org_id: string
+          pupil_id: string | null
+          rationale: string | null
+          selection: string
+          session_id: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          child_name: string
+          created_at?: string
+          id?: string
+          org_id: string
+          pupil_id?: string | null
+          rationale?: string | null
+          selection: string
+          session_id?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          child_name?: string
+          created_at?: string
+          id?: string
+          org_id?: string
+          pupil_id?: string | null
+          rationale?: string | null
+          selection?: string
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ta_notifications_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ta_notifications_pupil_id_fkey"
+            columns: ["pupil_id"]
+            isOneToOne: false
+            referencedRelation: "pupils"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ta_notifications_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
             referencedColumns: ["id"]
           },
         ]
