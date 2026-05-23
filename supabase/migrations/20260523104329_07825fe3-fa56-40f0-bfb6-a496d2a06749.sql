@@ -1,0 +1,1 @@
+REVOKE ALL ON public.mv_pupil_transitions FROM anon, authenticated;
