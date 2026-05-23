@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useStudent } from "@/contexts/StudentContext";
 import DepthSelector from "@/components/settings/DepthSelector";
+import AttributionFooter from "@/components/settings/AttributionFooter";
 import type { Depth } from "@/lib/depthRouter";
 import { toast } from "sonner";
 
@@ -69,7 +70,7 @@ const SettingsPage = () => {
         </div>
       </header>
 
-      <section className="max-w-3xl mx-auto px-4 pb-12">
+      <section className="max-w-3xl mx-auto px-4 pb-12 space-y-8">
         {!currentPupilId ? (
           <p className="text-muted-foreground">
             Select a pupil from the board before changing settings.
@@ -79,6 +80,15 @@ const SettingsPage = () => {
         ) : (
           <DepthSelector value={depth} onChange={handleChange} disabled={saving} />
         )}
+
+        <Link
+          to="/review-symbols"
+          className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 font-semibold hover:bg-muted focus:outline-none focus:ring-4 focus:ring-ring/50"
+        >
+          Review pending symbols →
+        </Link>
+
+        <AttributionFooter />
       </section>
     </main>
   );

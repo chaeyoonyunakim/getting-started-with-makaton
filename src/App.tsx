@@ -9,6 +9,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
 import SettingsPage from "./pages/Settings";
+import ReviewSymbols from "./pages/ReviewSymbols";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <SettingsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/review-symbols"
+                element={
+                  <ProtectedRoute>
+                    <ReviewSymbols />
                   </ProtectedRoute>
                 }
               />

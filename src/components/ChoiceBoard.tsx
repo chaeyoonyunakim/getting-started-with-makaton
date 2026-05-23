@@ -393,7 +393,7 @@ const ChoiceBoard = () => {
                 <Sparkles className="w-10 h-10 text-accent" />
               </div>
               <p className="text-xl text-muted-foreground mb-8">You picked 3 things! Here's your Golden Sign!</p>
-              <img src={rewardImage} alt="Your Golden Makaton Sign" className="w-64 h-64 sm:w-80 sm:h-80 object-contain rounded-3xl shadow-2xl border-4 border-accent animate-victory-bounce" />
+              <img src={rewardImage} alt="Your Golden Sign" className="w-64 h-64 sm:w-80 sm:h-80 object-contain rounded-3xl shadow-2xl border-4 border-accent animate-victory-bounce" />
               <button
                 onClick={() => {
                   setRewardOpen(false);

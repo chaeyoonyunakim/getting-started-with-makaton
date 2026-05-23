@@ -146,42 +146,77 @@ export type Database = {
       }
       cards: {
         Row: {
-          attribution: string | null
+          attribution: string
           category_key: string | null
           created_at: string
           id: string
           key: string
           label: string
-          licence: string | null
+          licence: string
           makaton_stage: number | null
-          source: string | null
+          source: string
           symbol_url: string | null
         }
         Insert: {
-          attribution?: string | null
+          attribution: string
           category_key?: string | null
           created_at?: string
           id?: string
           key: string
           label: string
-          licence?: string | null
+          licence: string
           makaton_stage?: number | null
-          source?: string | null
+          source: string
           symbol_url?: string | null
         }
         Update: {
-          attribution?: string | null
+          attribution?: string
           category_key?: string | null
           created_at?: string
           id?: string
           key?: string
           label?: string
-          licence?: string | null
+          licence?: string
           makaton_stage?: number | null
-          source?: string | null
+          source?: string
           symbol_url?: string | null
         }
         Relationships: []
+      }
+      org_symbol_packs: {
+        Row: {
+          attribution: string
+          created_at: string
+          id: string
+          image_url: string
+          label: string
+          org_id: string
+        }
+        Insert: {
+          attribution?: string
+          created_at?: string
+          id?: string
+          image_url: string
+          label: string
+          org_id: string
+        }
+        Update: {
+          attribution?: string
+          created_at?: string
+          id?: string
+          image_url?: string
+          label?: string
+          org_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_symbol_packs_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       organisations: {
         Row: {
@@ -342,6 +377,7 @@ export type Database = {
           ehcp_categories: string[] | null
           grid_size: number
           id: string
+          makaton_licensed: boolean
           makaton_stage: number | null
           org_id: string
           year_group: number | null
@@ -353,6 +389,7 @@ export type Database = {
           ehcp_categories?: string[] | null
           grid_size?: number
           id?: string
+          makaton_licensed?: boolean
           makaton_stage?: number | null
           org_id: string
           year_group?: number | null
@@ -364,6 +401,7 @@ export type Database = {
           ehcp_categories?: string[] | null
           grid_size?: number
           id?: string
+          makaton_licensed?: boolean
           makaton_stage?: number | null
           org_id?: string
           year_group?: number | null
@@ -445,6 +483,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "scenes_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      symbol_review_queue: {
+        Row: {
+          candidate_url: string
+          created_at: string
+          id: string
+          label: string
+          org_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_name: string | null
+          source: string
+          state: string
+        }
+        Insert: {
+          candidate_url: string
+          created_at?: string
+          id?: string
+          label: string
+          org_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_name?: string | null
+          source?: string
+          state?: string
+        }
+        Update: {
+          candidate_url?: string
+          created_at?: string
+          id?: string
+          label?: string
+          org_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_name?: string | null
+          source?: string
+          state?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "symbol_review_queue_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organisations"
