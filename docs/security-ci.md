@@ -12,6 +12,7 @@ in-app Lovable security scanner flagged during the pilot hardening pass.
 | `supabase-policy-lint` | custom Python + awk | `DISABLE ROW LEVEL SECURITY`, `USING (true)` / `WITH CHECK (true)` on non-catalogue tables, `SECURITY DEFINER` without `set search_path`, a `role` column on `profiles`, edits to reserved schemas (`auth`, `storage`, `realtime`, `supabase_functions`, `vault`). |
 | `rls-regression` | `scripts/check-rls-regression.ts` | Key RLS guards (org scoping, `has_role` checks, sensitive-policy allowlist in `supabase/security/sensitive-policies.json`) are still present after each migration. |
 | `hibp-protection` | `scripts/check-hibp-protection.ts` | HIBP leaked-password protection remains enabled in Supabase Auth; no bypass patterns introduced in source. |
+| `docs-freshness` | `scripts/check-docs-freshness.ts` | Documented file paths (`docs/filesExplainer.md` trees), database tables, and CI job names still exist in the repo. Fails CI when docs drift from reality. |
 | `unit-tests` | `vitest`, `eslint` | Regressions in board rendering, prediction blending, session state, depth routing, prompt-input sanitiser, and pupil-delete RLS. |
 
 ## Running locally
