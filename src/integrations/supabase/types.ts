@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      card_modifiers: {
+        Row: {
+          card_id: string
+          created_at: string
+          id: string
+          label: string
+          modifier_key: string
+        }
+        Insert: {
+          card_id: string
+          created_at?: string
+          id?: string
+          label: string
+          modifier_key: string
+        }
+        Update: {
+          card_id?: string
+          created_at?: string
+          id?: string
+          label?: string
+          modifier_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "card_modifiers_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cards: {
         Row: {
           attribution: string | null
@@ -106,6 +138,42 @@ export type Database = {
           },
         ]
       }
+      pupil_scene_overrides: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          pupil_id: string
+          scene_id: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          pupil_id: string
+          scene_id: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          pupil_id?: string
+          scene_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pupil_scene_overrides_pupil_id_fkey"
+            columns: ["pupil_id"]
+            isOneToOne: false
+            referencedRelation: "pupils"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pupil_scene_overrides_scene_id_fkey"
+            columns: ["scene_id"]
+            isOneToOne: false
+            referencedRelation: "scenes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pupils: {
         Row: {
           created_at: string
@@ -143,6 +211,80 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "pupils_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scene_cards: {
+        Row: {
+          card_id: string
+          created_at: string
+          position: number
+          scene_id: string
+        }
+        Insert: {
+          card_id: string
+          created_at?: string
+          position: number
+          scene_id: string
+        }
+        Update: {
+          card_id?: string
+          created_at?: string
+          position?: number
+          scene_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scene_cards_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scene_cards_scene_id_fkey"
+            columns: ["scene_id"]
+            isOneToOne: false
+            referencedRelation: "scenes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scenes: {
+        Row: {
+          created_at: string
+          icon_url: string | null
+          id: string
+          key: string
+          label: string
+          org_id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          icon_url?: string | null
+          id?: string
+          key: string
+          label: string
+          org_id: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          icon_url?: string | null
+          id?: string
+          key?: string
+          label?: string
+          org_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scenes_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organisations"
