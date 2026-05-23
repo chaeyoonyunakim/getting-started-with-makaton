@@ -288,6 +288,10 @@ const AuthPage = () => {
         </div>
       </div>
     </main>
+      ) : (
+        <Navigate to="/" replace />
+      )}
+    </>
   );
 };
 
