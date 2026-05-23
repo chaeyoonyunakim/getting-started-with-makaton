@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
 import SettingsPage from "./pages/Settings";
 import ReviewSymbols from "./pages/ReviewSymbols";
+import SessionDetail from "./pages/SessionDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <ReviewSymbols />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/sessions/:id"
+                element={
+                  <ProtectedRoute>
+                    <SessionDetail />
                   </ProtectedRoute>
                 }
               />

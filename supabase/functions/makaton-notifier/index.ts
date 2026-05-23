@@ -1,44 +1,65 @@
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+// In-app TA notifier. Replaces the previous Slack webhook integration —
+// selection data never leaves the project's Supabase region.
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+
+interface Body {
+  child_name?: string;
+  selection: string;
+  rationale?: string;
+  pupil_id?: string | null;
+  session_id?: string | null;
+}
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  const API_TOKEN = Deno.env.get("CODEWORDS_API_TOKEN");
-  if (!API_TOKEN) {
-    return new Response(JSON.stringify({ error: "Server config error" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
-    const { selection, child_name } = await req.json();
-
-    const res = await fetch(
-      "https://runtime.codewords.ai/run/makaton_board_notifier_b9732208/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${API_TOKEN}`,
-        },
-        body: JSON.stringify({ child_name: child_name || "Sam", selection }),
-      }
+    const auth = req.headers.get("Authorization");
+    if (!auth) {
+      return new Response(JSON.stringify({ error: "missing auth" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const body = (await req.json()) as Partial<Body>;
+    const selection = (body.selection ?? "").toString().slice(0, 200).trim();
+    if (!selection) {
+      return new Response(JSON.stringify({ error: "selection required" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const client = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: auth } } },
     );
-
-    const data = await res.json();
-    return new Response(JSON.stringify(data), {
-      status: res.status,
+    const { data: profile } = await client.from("profiles").select("org_id").maybeSingle();
+    const orgId = profile?.org_id;
+    if (!orgId) {
+      return new Response(JSON.stringify({ error: "no org" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { data, error } = await client
+      .from("ta_notifications")
+      .insert({
+        org_id: orgId,
+        pupil_id: body.pupil_id ?? null,
+        session_id: body.session_id ?? null,
+        child_name: body.child_name ?? "Pupil",
+        selection,
+        rationale: body.rationale ?? null,
+      })
+      .select("id")
+      .single();
+    if (error) throw error;
+    return new Response(JSON.stringify({ ok: true, id: data.id }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+  } catch (e) {
+    return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
