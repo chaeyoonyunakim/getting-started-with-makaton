@@ -4,18 +4,10 @@ import { Category } from "@/types/choiceBoard";
  * Makaton choice board data.
  *
  * Images are stored locally under /public/symbols/[name].png.
- * If an image isn't available yet the MakatonPlaceholder fallback is shown.
+ * If an image isn't available yet BoardCell calls resolveSymbol (ARASAAC → Mulberry → Sclera).
  */
 
-/** Try local first, GitHub repo as secondary source */
-const GITHUB_SYMBOLS_BASE =
-  "https://raw.githubusercontent.com/chaeyoonyunakim/getting-started-with-mackathon/main/public/symbols";
-
 const symbolPath = (name: string) => `/symbols/${name}.png`;
-
-/** GitHub-hosted fallback URL for a symbol */
-export const githubSymbolUrl = (name: string) =>
-  `${GITHUB_SYMBOLS_BASE}/${encodeURIComponent(name)}.png`;
 
 export const categories: Category[] = [
   {

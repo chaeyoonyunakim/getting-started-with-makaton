@@ -21,7 +21,3 @@ export function makatonAssetUrl(makatonId: number): string {
   return `${MAKATON_ASSET_BANK_BASE}/action/viewAsset?id=${makatonId}`;
 }
 
-/** Build the direct image/thumbnail URL for a Makaton asset */
-export function makatonImageUrl(makatonId: number): string {
-  return `${MAKATON_ASSET_BANK_BASE}/servlet/display?file=${makatonId}.png`;
-}

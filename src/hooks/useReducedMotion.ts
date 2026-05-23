@@ -13,14 +13,14 @@ export function useReducedMotion() {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored === "true") return true;
       if (stored === "false") return false;
-    } catch {}
+    } catch { /* noop */ }
     return systemPrefers();
   });
 
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, String(reduced));
-    } catch {}
+    } catch { /* noop */ }
     document.documentElement.classList.toggle("reduce-motion", reduced);
   }, [reduced]);
 
@@ -31,7 +31,7 @@ export function useReducedMotion() {
     const handler = () => {
       try {
         if (localStorage.getItem(STORAGE_KEY) === null) setReduced(mql.matches);
-      } catch {}
+      } catch { /* noop */ }
     };
     mql.addEventListener?.("change", handler);
     return () => mql.removeEventListener?.("change", handler);

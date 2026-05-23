@@ -21,7 +21,7 @@ interface Prediction {
 
 const SessionDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const [session, setSession] = useState<any | null>(null);
+  const [session, setSession] = useState<Record<string, unknown> | null>(null);
   const [selections, setSelections] = useState<Selection[]>([]);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [labels, setLabels] = useState<Record<string, string>>({});
@@ -43,7 +43,7 @@ const SessionDetail = () => {
       if (cardIds.length) {
         const { data: cards } = await supabase.from("cards").select("id, label").in("id", cardIds);
         const map: Record<string, string> = {};
-        for (const c of cards ?? []) map[(c as any).id] = (c as any).label;
+        for (const c of cards ?? []) map[(c as { id: string }).id] = (c as { label: string }).label;
         setLabels(map);
       }
     })();

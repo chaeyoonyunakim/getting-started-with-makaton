@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
       .order("position");
     const visibleIds = (sceneCards ?? []).map((r: Json) => r.card_id as string);
     const labelByCard: Record<string, string> = {};
-    for (const row of (sceneCards ?? []) as any[]) {
+    for (const row of (sceneCards ?? []) as Json[]) {
       if (row.cards) labelByCard[row.card_id] = row.cards.label;
     }
     if (visibleIds.length === 0) {
@@ -102,7 +102,7 @@ Deno.serve(async (req) => {
     const now = Date.now();
     const decayed: Record<string, number> = {};
     for (const id of visibleIds) decayed[id] = 0;
-    for (const t of (transitions ?? []) as any[]) {
+    for (const t of (transitions ?? []) as Json[]) {
       if ((t.from_card_id ?? null) !== (currentCardId ?? null)) continue;
       if (!visibleIds.includes(t.to_card_id)) continue;
       const days = (now - new Date(t.last_seen_at).getTime()) / 86_400_000;
@@ -118,7 +118,7 @@ Deno.serve(async (req) => {
       .from("bandit_arms")
       .select("card_id, alpha, beta")
       .eq("scene_id", sceneId);
-    const armById = new Map((arms ?? []).map((a: any) => [a.card_id, a]));
+    const armById = new Map((arms ?? []).map((a: Json) => [a.card_id as string, a]));
     const banditMeans: Record<string, number> = {};
     let bSum = 0;
     for (const id of visibleIds) {

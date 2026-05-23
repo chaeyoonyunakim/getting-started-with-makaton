@@ -153,7 +153,36 @@ column records a pupil's home language for SENCo reference.
 
 - `bun install`
 - `bun run dev`
+- `bun run lint` — ESLint (TypeScript + React rules)
 - `bunx vitest run` — Vitest smoke tests
 - See [`CHANGELOG.md`](CHANGELOG.md) for release history and
   [`docs/pilot-smoke-test.md`](docs/pilot-smoke-test.md) for the TA
   manual verification checklist.
+
+## Credentials and secrets
+
+`.env` is tracked in version control. It contains only publishable
+`VITE_` variables — the Supabase project URL, project ID, and anon JWT
+(`role: anon`). These are embedded in the frontend bundle at build time
+and are safe to commit; security is enforced by RLS, not by keeping the
+anon key secret. They are also allowlisted in `.gitleaks.toml` so the
+secret scan does not flag them.
+
+**Never** store `SUPABASE_SERVICE_ROLE_KEY` or any key with
+`role: service_role` in `.env` or anywhere else in the repository.
+Edge functions read the service key from a Supabase-injected environment
+variable at runtime only.
+
+## CI
+
+Every pull request runs `.github/workflows/security.yml`:
+
+| Job | Tool | What it checks |
+|---|---|---|
+| `dependency-audit` | `bun audit` | No critical-severity advisories in production deps |
+| `secret-scan` | Gitleaks | No credentials or API keys committed to history |
+| `static-analysis` | Semgrep | OWASP Top 10, security-audit, TypeScript, React, and secrets rulesets |
+| `supabase-policy-lint` | Python + awk | No `DISABLE ROW LEVEL SECURITY`; no `USING (true)` / `WITH CHECK (true)` on non-catalogue tables; `SECURITY DEFINER` functions must pin `search_path`; no `role` column on `profiles` |
+| `rls-regression` | `scripts/check-rls-regression.ts` | Key RLS guards still present after each migration |
+| `hibp-protection` | `scripts/check-hibp-protection.ts` | HIBP leaked-password check enabled; no bypass patterns in source |
+| `unit-tests` | Vitest + ESLint | Smoke tests pass; zero lint errors |

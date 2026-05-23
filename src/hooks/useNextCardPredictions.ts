@@ -39,7 +39,7 @@ export function useNextCardPredictions(
           },
         });
         if (error || cancelled) return;
-        setTop3(((data as any)?.top3 ?? []) as PredictedChoice[]);
+        setTop3(((data as { top3?: PredictedChoice[] } | null)?.top3 ?? []) as PredictedChoice[]);
       } catch {
         /* non-blocking */
       }

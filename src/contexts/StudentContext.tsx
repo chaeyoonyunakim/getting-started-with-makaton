@@ -27,7 +27,7 @@ export const StudentProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem("currentStudent", trimmed);
       if (pupilId) localStorage.setItem("currentPupilId", pupilId);
       else localStorage.removeItem("currentPupilId");
-    } catch {}
+    } catch { /* noop */ }
   }, []);
 
   return (

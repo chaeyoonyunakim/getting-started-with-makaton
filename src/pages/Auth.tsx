@@ -34,8 +34,8 @@ const AuthPage = () => {
         if (error) throw error;
         navigate("/", { replace: true });
       }
-    } catch (err: any) {
-      toast.error(err?.message ?? "Authentication failed");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Authentication failed");
     } finally {
       setSubmitting(false);
     }

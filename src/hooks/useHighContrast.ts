@@ -14,7 +14,7 @@ export function useHighContrast() {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, String(highContrast));
-    } catch {}
+    } catch { /* noop */ }
     document.documentElement.classList.toggle("high-contrast", highContrast);
   }, [highContrast]);
 

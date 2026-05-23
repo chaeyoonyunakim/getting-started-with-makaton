@@ -47,13 +47,13 @@ const QuickChoices = ({ category, highContrast, historyLog, onSelect }: QuickCho
         });
         if (error) throw error;
 
-        const raw: any[] =
-          data?.predicted_signs ||
-          data?.predictions ||
-          data?.signs ||
+        const raw: unknown[] =
+          (data as Record<string, unknown[]> | null)?.predicted_signs ||
+          (data as Record<string, unknown[]> | null)?.predictions ||
+          (data as Record<string, unknown[]> | null)?.signs ||
           (Array.isArray(data) ? data : []);
 
-        const signs: PredictedSign[] = raw.slice(0, 3).map((s: any) => {
+        const signs: PredictedSign[] = raw.slice(0, 3).map((s: unknown) => {
           const label = typeof s === "string" ? s : s?.sign_name || s?.label || s?.name || String(s);
           return { label, imagePath: resolveImage(label) };
         });

@@ -154,7 +154,7 @@ const ChoiceBoard = () => {
         .invoke("makaton-notifier", { body: { child_name: currentStudent, selection: item.label } })
         .then(({ error }) => {
           if (error) {
-            const errMsg = typeof error === "object" && "message" in error ? (error as any).message : String(error);
+            const errMsg = typeof error === "object" && error !== null && "message" in error ? (error as { message: string }).message : String(error);
             if (errMsg.includes("429") || errMsg.toLowerCase().includes("rate limit")) {
               toast.error("Slow down! 🐢", { description: "Too many requests — please wait a moment.", duration: 5000 });
             } else {
@@ -191,7 +191,7 @@ const ChoiceBoard = () => {
               playNote(523, 0, 0.2);
               playNote(659, 0.15, 0.2);
               playNote(784, 0.3, 0.4);
-            } catch {}
+            } catch { /* noop */ }
           }
         } catch {
           toast.error("Reward couldn't load", { description: "But great job picking 3 things! ⭐" });

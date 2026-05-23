@@ -63,12 +63,13 @@ const INJECTION_PATTERNS: RegExp[] = [
  * braces (template delimiters), angle brackets (HTML/XML), pipes
  * (markdown table cells), dollar signs (template literals), and quotes.
  */
-const STRUCTURAL_CHAR_RE = /[`{}<>|$\"]/g;
+const STRUCTURAL_CHAR_RE = /[`{}<>|$"]/g;
 
 /** Zero-width and bidi-override characters used to hide payloads. */
 const HIDDEN_CHAR_RE = /[\u200B-\u200F\u202A-\u202E\u2060-\u2064\uFEFF]/g;
 
 /** All ASCII / Unicode C0 + C1 control characters. */
+// eslint-disable-next-line no-control-regex
 const CONTROL_CHAR_RE = /[\u0000-\u001F\u007F-\u009F]/g;
 
 export function sanitizePromptInput(
