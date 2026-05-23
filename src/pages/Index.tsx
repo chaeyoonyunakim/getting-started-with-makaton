@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import ChoiceBoard from "@/components/ChoiceBoard";
 import StudentSetupModal from "@/components/StudentSetupModal";
 import StudentProfileChip from "@/components/StudentProfileChip";
+import CoreStripBar from "@/components/board/CoreStripBar";
 import { useStudent } from "@/contexts/StudentContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
