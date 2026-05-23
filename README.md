@@ -159,6 +159,20 @@ column records a pupil's home language for SENCo reference.
   [`docs/pilot-smoke-test.md`](docs/pilot-smoke-test.md) for the TA
   manual verification checklist.
 
+## Credentials and secrets
+
+`.env` is tracked in version control. It contains only publishable
+`VITE_` variables — the Supabase project URL, project ID, and anon JWT
+(`role: anon`). These are embedded in the frontend bundle at build time
+and are safe to commit; security is enforced by RLS, not by keeping the
+anon key secret. They are also allowlisted in `.gitleaks.toml` so the
+secret scan does not flag them.
+
+**Never** store `SUPABASE_SERVICE_ROLE_KEY` or any key with
+`role: service_role` in `.env` or anywhere else in the repository.
+Edge functions read the service key from a Supabase-injected environment
+variable at runtime only.
+
 ## CI
 
 Every pull request runs `.github/workflows/security.yml`:
