@@ -125,7 +125,7 @@ async function tryAi(
   if (Deno.env.get("ENABLE_AI_SYMBOLS") !== "true") return null;
   const apiKey = Deno.env.get("LOVABLE_API_KEY");
   if (!apiKey) return null;
-  const safeLabel = label.replace(/[^\p{L}\p{N}\s\-_.]/gu, "").slice(0, 80) || "symbol";
+  const safeLabel = sanitizePromptInput(label, { maxLength: 80, fallback: "symbol" });
   try {
     const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
