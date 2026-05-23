@@ -131,7 +131,7 @@ const AuthPage = () => {
 
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <SeoHead
-        title="Sign in — AAC Choice Board for SEND classrooms"
+        title="Sign in — The Makaton for SEND classrooms"
         description="Teaching Assistants and SENCOs sign in to manage Makaton pupil profiles and start communication sessions."
         path="/auth"
       />

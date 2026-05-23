@@ -89,7 +89,7 @@ const SessionDetail = () => {
   return (
     <main className="container py-6 space-y-6 max-w-4xl">
       <SeoHead
-        title="Session detail — AAC Choice Board"
+        title="Session detail — The Makaton"
         description="Review a pupil session: card selections, dwell times, predictions, and golden-sign awards."
         path={`/sessions/${id ?? ""}`}
       />

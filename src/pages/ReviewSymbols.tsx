@@ -64,7 +64,7 @@ const ReviewSymbols = () => {
   return (
     <main className="container py-8 space-y-6">
       <SeoHead
-        title="Review pending symbols — AAC Choice Board"
+        title="Review pending symbols — The Makaton"
         description="SENCo review queue for AI-generated Makaton symbols awaiting approval before joining the pupil library."
         path="/review-symbols"
       />

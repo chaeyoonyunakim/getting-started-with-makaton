@@ -37,7 +37,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SeoHead
-        title="AAC Choice Board — Makaton communication for SEND pupils"
+        title="The Makaton — Makaton communication for SEND pupils"
         description="Picture-led Makaton choice board for SEND classrooms. High-contrast cards, predictive suggestions, and SENCo-managed pupil profiles."
         path="/"
       />

@@ -66,7 +66,7 @@ const SettingsPage = () => {
   return (
     <main className="min-h-screen bg-background">
       <SeoHead
-        title="Pupil settings — AAC Choice Board"
+        title="Pupil settings — The Makaton"
         description="Adjust pupil depth, grid size, motion, and contrast preferences for the Makaton choice board."
         path="/settings"
       />
