@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { UserRound, Pencil } from "lucide-react";
+import { UserRound, Pencil, LogOut } from "lucide-react";
 import { useStudent } from "@/contexts/StudentContext";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +11,7 @@ import {
 
 const StudentProfileChip = () => {
   const { currentStudent, setCurrentStudent, isProfileSet } = useStudent();
+  const { user, signOut } = useAuth();
   const [editOpen, setEditOpen] = useState(false);
   const [name, setName] = useState("");
 
