@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useMemo } from "react";
 import { ArrowLeft, Loader2, X, Sparkles, Info, RotateCcw, Eye, Check } from "lucide-react";
-import { categories, githubSymbolUrl } from "@/data/makaton";
+import { categories } from "@/data/makaton";
 import { Category, ChoiceItem, makatonAssetUrl } from "@/types/choiceBoard";
 import { supabase } from "@/integrations/supabase/client";
 import { useStudent } from "@/contexts/StudentContext";
