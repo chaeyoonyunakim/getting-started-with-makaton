@@ -65,7 +65,13 @@ const SettingsPage = () => {
 
   return (
     <main className="min-h-screen bg-background">
+      <SeoHead
+        title="Pupil settings — AAC Choice Board"
+        description="Adjust pupil depth, grid size, motion, and contrast preferences for the Makaton choice board."
+        path="/settings"
+      />
       <header className="max-w-3xl mx-auto px-4 py-6 flex items-center gap-4">
+
         <Link
           to="/"
           className="min-w-16 min-h-16 flex items-center justify-center bg-primary text-primary-foreground rounded-2xl shadow-md focus:outline-none focus:ring-4 focus:ring-ring/50"
