@@ -51,12 +51,12 @@ export function recordSelection(
 }
 
 export function shouldEndForInactivity(state: SessionState, now: number, inactivityMs = INACTIVITY_MS) {
-  if (!state.lastActivityAt || state.endedAt) return false;
+  if (state.lastActivityAt === null || state.endedAt !== null) return false;
   return now - state.lastActivityAt >= inactivityMs;
 }
 
 export function shouldShowSoftCap(state: SessionState, now: number, softCapMs = SOFT_CAP_MS) {
-  if (!state.startedAt || state.endedAt) return false;
+  if (state.startedAt === null || state.endedAt !== null) return false;
   return now - state.startedAt >= softCapMs;
 }
 
