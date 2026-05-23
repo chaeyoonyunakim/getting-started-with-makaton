@@ -9,7 +9,7 @@ import SeoHead from "@/components/SeoHead";
 const AuthPage = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -29,6 +29,13 @@ const AuthPage = () => {
         });
         if (error) throw error;
         toast.success("Account created!", { description: "Check your inbox to confirm your email." });
+      } else if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        toast.success("Reset link sent", { description: "Check your inbox for the password reset email." });
+        setMode("signin");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -41,6 +48,8 @@ const AuthPage = () => {
     }
   };
 
+  const title = mode === "forgot" ? "Reset password" : mode === "signin" ? "Sign in" : "Create account";
+
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4">
       <SeoHead
@@ -51,9 +60,7 @@ const AuthPage = () => {
       <div className="w-full max-w-sm bg-card rounded-2xl shadow-lg p-8 flex flex-col gap-6 border border-border">
 
         <header className="text-center">
-          <h1 className="text-2xl font-bold text-foreground">
-            {mode === "signin" ? "Sign in" : "Create account"}
-          </h1>
+          <h1 className="text-2xl font-bold text-foreground">{title}</h1>
           <p className="text-sm text-muted-foreground mt-2">
             For Teaching Assistants and SENCOs
           </p>
@@ -71,30 +78,50 @@ const AuthPage = () => {
             autoComplete="email"
             className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground focus:outline-none focus:ring-4 focus:ring-ring/50"
           />
-          <label htmlFor="auth-password" className="sr-only">Password</label>
-          <input
-            id="auth-password"
-            type="password"
-            required
-            minLength={6}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            aria-label="Password"
-            autoComplete={mode === "signin" ? "current-password" : "new-password"}
-            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground focus:outline-none focus:ring-4 focus:ring-ring/50"
-          />
+          {mode !== "forgot" && (
+            <>
+              <label htmlFor="auth-password" className="sr-only">Password</label>
+              <input
+                id="auth-password"
+                type="password"
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                aria-label="Password"
+                autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground focus:outline-none focus:ring-4 focus:ring-ring/50"
+              />
+            </>
+          )}
           <button
             type="submit"
             disabled={submitting}
             className="w-full bg-primary text-primary-foreground rounded-xl px-6 py-3 text-lg font-bold shadow-md transition-transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-ring/50 disabled:opacity-50"
           >
-            {submitting ? "Please wait…" : mode === "signin" ? "Sign in" : "Sign up"}
+            {submitting
+              ? "Please wait…"
+              : mode === "forgot"
+                ? "Send reset link"
+                : mode === "signin"
+                  ? "Sign in"
+                  : "Sign up"}
           </button>
         </form>
+
+        {mode === "signin" && (
+          <button
+            onClick={() => setMode("forgot")}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors self-center"
+          >
+            Forgot password?
+          </button>
+        )}
+
         <button
           onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors self-center"
         >
           {mode === "signin"
             ? "No account? Create one"
