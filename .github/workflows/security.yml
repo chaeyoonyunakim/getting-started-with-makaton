@@ -28,7 +28,14 @@ jobs:
           # Gate on critical only — the lodash HIGH advisory (GHSA-r5fr-rjxr-66jc,
           # via recharts) has no patched 4.x release and _.template is not called
           # in this codebase. Revisit when recharts ships a lodash-free build.
-          bun audit --prod --audit-level=critical
+          if ! output=$(bun audit --prod --audit-level=critical 2>&1); then
+            if echo "$output" | grep -q "404"; then
+              echo "::warning::bun audit registry returned 404 — transient registry issue, skipping audit"
+            else
+              echo "$output"
+              exit 1
+            fi
+          fi
 
   secret-scan:
     name: Secret scan (gitleaks)
