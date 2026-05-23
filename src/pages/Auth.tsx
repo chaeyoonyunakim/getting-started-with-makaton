@@ -51,6 +51,23 @@ const AuthPage = () => {
 
   const title = mode === "forgot" ? "Reset password" : mode === "signin" ? "Sign in" : "Create account";
 
+  const handleGoogleSignIn = async () => {
+    setSubmitting(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) throw result.error;
+      if (!result.redirected) {
+        navigate("/", { replace: true });
+      }
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Google sign-in failed");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4">
       <SeoHead
