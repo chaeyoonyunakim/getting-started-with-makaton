@@ -152,7 +152,7 @@ const ChoiceBoard = () => {
     try {
       const { data, error } = await supabase.functions.invoke("makaton-predict", {
         body: {
-          child_name: currentStudent,
+          child_name: currentPupilId ?? "pupil",
           category: category.label,
           history_log: selectionsRef.current.length > 0 ? selectionsRef.current : ["general"],
           is_first_session: selectionsRef.current.length === 0,
