@@ -3,7 +3,7 @@ import { Check, CloudUpload, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import MakatonPlaceholder from "@/components/MakatonPlaceholder";
-import { githubSymbolUrl } from "@/data/makaton";
+
 import {
   Tooltip,
   TooltipContent,
