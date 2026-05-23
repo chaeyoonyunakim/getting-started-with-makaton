@@ -42,15 +42,17 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    const child_name = ((body.child_name ?? "Pupil").toString().slice(0, 100).trim()) || "Pupil";
+    const rationale = body.rationale ? body.rationale.toString().slice(0, 500).trim() || null : null;
     const { data, error } = await client
       .from("ta_notifications")
       .insert({
         org_id: orgId,
         pupil_id: body.pupil_id ?? null,
         session_id: body.session_id ?? null,
-        child_name: body.child_name ?? "Pupil",
+        child_name,
         selection,
-        rationale: body.rationale ?? null,
+        rationale,
       })
       .select("id")
       .single();

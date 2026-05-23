@@ -1,0 +1,13 @@
+# AAC Choice Board
+
+> A digital Makaton choice board for SEND (Special Educational Needs and Disabilities) pupils and their teaching assistants. Picture-led, high-contrast cards with predictive suggestions and SENCo-managed pupil profiles.
+
+The app is a two-level grid (categories → sub-choices) optimised for accessible communication in UK classrooms. Authentication is required for teaching assistants and SENCos; pupils interact through a TA-supervised session.
+
+## Pages
+
+- [Home](/): The choice board itself. Requires an authenticated TA or SENCo session.
+
+## Optional
+
+- [Sign in](/auth): Account sign-in and sign-up for teaching staff.

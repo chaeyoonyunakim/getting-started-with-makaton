@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { sanitizePromptInput } from "../_shared/sanitizePromptInput.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -67,10 +68,8 @@ Deno.serve(async (req) => {
       ALLOWED_URL_PREFIXES.some((p) => assetUrl.startsWith(p))
         ? assetUrl
         : "N/A";
-    const sanitise = (s: string, n: number) =>
-      s.replace(/[^\p{L}\p{N}\s\-_.]/gu, "").slice(0, n);
-    const safeLabel = sanitise(typeof label === "string" ? label : "unknown", 80) || "unknown";
-    const safeColor = sanitise(typeof color === "string" ? color : "Electric Blue", 40) || "Electric Blue";
+    const safeLabel = sanitizePromptInput(label, { maxLength: 80, fallback: "unknown" });
+    const safeColor = sanitizePromptInput(color, { maxLength: 40, fallback: "Electric Blue" });
     const prompt = `You are given a Makaton sign diagram reference for "${safeLabel}" (Makaton Asset Bank ID: ${safeMakatonId}, URL: ${safeAssetUrl}). Generate a version of this Makaton sign where the black lines are changed to a vibrant ${safeColor} and add a soft glowing background. Keep the technical integrity of the sign perfect — do NOT change the shape, line weight, or characters.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

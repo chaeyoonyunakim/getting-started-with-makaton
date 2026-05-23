@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useMemo } from "react";
 import { ArrowLeft, Loader2, X, Sparkles, Info, RotateCcw, Eye, Check } from "lucide-react";
-import { categories, githubSymbolUrl } from "@/data/makaton";
+import { categories } from "@/data/makaton";
 import { Category, ChoiceItem, makatonAssetUrl } from "@/types/choiceBoard";
 import { supabase } from "@/integrations/supabase/client";
 import { useStudent } from "@/contexts/StudentContext";
@@ -68,8 +68,6 @@ const ChoiceBoard = () => {
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
   const [greeting, setGreeting] = useState("");
   const [greetingLoading, setGreetingLoading] = useState(false);
-  const [dynamicItems, setDynamicItems] = useState<ChoiceItem[]>([]);
-  const [dynamicLoading, setDynamicLoading] = useState(false);
   const [selectionCount, setSelectionCount] = useState(0);
   const selectionsRef = useRef<string[]>([]);
   const [rewardImage, setRewardImage] = useState<string | null>(null);
@@ -96,8 +94,6 @@ const ChoiceBoard = () => {
     setActiveCategory(null);
     setGreeting("");
     setGreetingLoading(false);
-    setDynamicItems([]);
-    setDynamicLoading(false);
     setSelectionCount(0);
     selectionsRef.current = [];
     setRewardImage(null);
@@ -122,66 +118,12 @@ const ChoiceBoard = () => {
     }
   }, []);
 
-  const probeImage = useCallback((url: string): Promise<boolean> => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => resolve(true);
-      img.onerror = () => resolve(false);
-      img.src = url;
-      setTimeout(() => resolve(false), 3000);
-    });
-  }, []);
-
-  const fetchDynamicItems = useCallback(async (category: Category) => {
-    setDynamicLoading(true);
-    setDynamicItems([]);
-    const staticItems = category.items;
-    const probeResults = await Promise.all(
-      staticItems.map(async (item) => {
-        if (item.imagePath && (await probeImage(item.imagePath))) return { ...item, resolved: true };
-        const ghUrl = githubSymbolUrl(item.label.toLowerCase());
-        if (await probeImage(ghUrl)) return { ...item, imagePath: ghUrl, resolved: true };
-        return { ...item, resolved: false };
-      })
-    );
-    const resolvedCount = probeResults.filter((r) => r.resolved).length;
-    if (resolvedCount >= staticItems.length / 2) {
-      setDynamicItems(probeResults.map(({ resolved, ...item }) => item));
-      setDynamicLoading(false);
-      return;
-    }
-    try {
-      const { data, error } = await supabase.functions.invoke("makaton-predict", {
-        body: {
-          child_name: currentPupilId ?? "pupil",
-          category: category.label,
-          history_log: selectionsRef.current.length > 0 ? selectionsRef.current : ["general"],
-          is_first_session: selectionsRef.current.length === 0,
-        },
-      });
-      if (error) throw error;
-      const raw: any[] = data?.predicted_signs || data?.predictions || data?.signs || (Array.isArray(data) ? data : []);
-      const items: ChoiceItem[] = raw.slice(0, 6).map((s: any, i: number) => {
-        const label = typeof s === "string" ? s : s?.sign_name || s?.label || s?.name || String(s);
-        const imageSource = typeof s === "object" ? (s?.image_url || s?.imageSource || s?.image || s?.imagePath) : undefined;
-        const imagePath = imageSource || githubSymbolUrl(label.toLowerCase());
-        return { id: `dynamic-${category.id}-${i}`, label, makatonId: 0, imagePath, colorClass: category.colorClass };
-      });
-      setDynamicItems(items.length > 0 ? items : staticItems);
-    } catch {
-      setDynamicItems(staticItems);
-    } finally {
-      setDynamicLoading(false);
-    }
-  }, [currentStudent, probeImage]);
-
   const handleCategorySelect = useCallback(
     (category: Category) => {
       setActiveCategory(category);
       fetchGreeting(category);
-      fetchDynamicItems(category);
     },
-    [fetchGreeting, fetchDynamicItems]
+    [fetchGreeting]
   );
 
   const handleBack = useCallback(() => {
@@ -189,8 +131,6 @@ const ChoiceBoard = () => {
     setGreeting("");
     setGreetingLoading(false);
     setLastRationale(null);
-    setDynamicItems([]);
-    setDynamicLoading(false);
   }, []);
 
   const handleSubItemSelect = useCallback(
@@ -271,12 +211,11 @@ const ChoiceBoard = () => {
   const items = useMemo(() => {
     if (activeCategory) {
       if (childBoard?.gridItems?.length) return childBoard.gridItems;
-      if (dynamicItems.length > 0) return dynamicItems.map(itemToSymbol);
       return activeCategory.items.map(itemToSymbol);
     }
     if (rootBoard?.gridItems?.length) return rootBoard.gridItems;
     return categories.map((c) => itemToSymbol(c));
-  }, [activeCategory, childBoard, dynamicItems, rootBoard]);
+  }, [activeCategory, childBoard, rootBoard]);
 
   const cols = 2;
   const rows = Math.ceil(items.length / cols);
@@ -329,7 +268,7 @@ const ChoiceBoard = () => {
         <SpeechBubble text={greeting} loading={greetingLoading} onDismiss={() => setGreeting("")} />
       )}
 
-      {activeCategory && (dynamicLoading || (activeCategory && childBoard === undefined)) && (
+      {activeCategory && childBoard === undefined && (
         <BoardGrid rows={2} cols={2}>
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className={`bg-card ${highContrast ? "border-[6px] border-black" : "border-4 border-muted"} rounded-2xl shadow-md w-full aspect-square animate-pulse`} />
@@ -337,7 +276,7 @@ const ChoiceBoard = () => {
         </BoardGrid>
       )}
 
-      {!(activeCategory && dynamicLoading) && (
+      {!(activeCategory && childBoard === undefined) && (
         <BoardGrid rows={rows} cols={cols}>
           {items.map((sym) => (
             <div key={sym.id} className="relative">
@@ -352,9 +291,7 @@ const ChoiceBoard = () => {
                     const fullCat = categories.find((c) => c.id === sym.id || c.label === sym.label);
                     if (fullCat) handleCategorySelect(fullCat);
                   } else {
-                    const source = (dynamicItems.length > 0 ? dynamicItems : activeCategory.items).find(
-                      (i) => i.id === sym.id
-                    );
+                    const source = activeCategory.items.find((i) => i.id === sym.id);
                     if (source) handleSubItemSelect(source);
                   }
                 }}

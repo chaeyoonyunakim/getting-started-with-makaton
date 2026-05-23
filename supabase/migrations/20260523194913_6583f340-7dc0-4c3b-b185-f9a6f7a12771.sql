@@ -1,0 +1,1 @@
+UPDATE public.cards SET symbol_url = '/symbols/wash hands.png' WHERE key = 'wash';

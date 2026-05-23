@@ -136,7 +136,7 @@ const QuickChoices = ({ category, highContrast, historyLog, onSelect }: QuickCho
                 {sign.imagePath ? (
                   <img
                     src={sign.imagePath}
-                    alt={sign.label}
+                    alt={`${sign.label} Makaton symbol`}
                     className="w-full h-full object-contain"
                     onError={(e) => {
                       (e.currentTarget as HTMLImageElement).style.display = "none";

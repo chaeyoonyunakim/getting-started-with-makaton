@@ -51,21 +51,29 @@ const AuthPage = () => {
           </p>
         </header>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <label htmlFor="auth-email" className="sr-only">Email</label>
           <input
+            id="auth-email"
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
+            aria-label="Email"
+            autoComplete="email"
             className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground focus:outline-none focus:ring-4 focus:ring-ring/50"
           />
+          <label htmlFor="auth-password" className="sr-only">Password</label>
           <input
+            id="auth-password"
             type="password"
             required
             minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
+            aria-label="Password"
+            autoComplete={mode === "signin" ? "current-password" : "new-password"}
             className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground focus:outline-none focus:ring-4 focus:ring-ring/50"
           />
           <button

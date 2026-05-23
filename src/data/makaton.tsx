@@ -65,7 +65,7 @@ export const categories: Category[] = [
     colorClass: "bg-category-toilet",
     items: [
       { id: "toilet", label: "Toilet", makatonId: 3331, imagePath: symbolPath("toilet"), colorClass: "bg-category-toilet" },
-      { id: "wash", label: "Wash Hands", makatonId: 3332, imagePath: symbolPath("wash"), colorClass: "bg-category-toilet" },
+      { id: "wash", label: "Wash Hands", makatonId: 3332, imagePath: symbolPath("wash hands"), colorClass: "bg-category-toilet" },
       { id: "help", label: "Help", makatonId: 3333, imagePath: symbolPath("help"), colorClass: "bg-category-toilet" },
       { id: "change", label: "Change", makatonId: 3334, imagePath: symbolPath("change"), colorClass: "bg-category-toilet" },
     ],

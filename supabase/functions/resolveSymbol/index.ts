@@ -2,6 +2,7 @@
 // Order: org overlay (if licensed) -> ARASAAC -> Mulberry CDN -> Sclera (HC only) -> AI (flag) -> null
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { sanitizePromptInput } from "../_shared/sanitizePromptInput.ts";
 
 const ARASAAC_ATTR =
   "Symbols author: Sergio Palao. Origin: ARASAAC (https://arasaac.org). Licence: CC BY-NC-SA";
@@ -124,7 +125,7 @@ async function tryAi(
   if (Deno.env.get("ENABLE_AI_SYMBOLS") !== "true") return null;
   const apiKey = Deno.env.get("LOVABLE_API_KEY");
   if (!apiKey) return null;
-  const safeLabel = label.replace(/[^\p{L}\p{N}\s\-_.]/gu, "").slice(0, 80) || "symbol";
+  const safeLabel = sanitizePromptInput(label, { maxLength: 80, fallback: "symbol" });
   try {
     const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -163,8 +164,19 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
     const auth = req.headers.get("Authorization");
-    if (!auth) {
+    if (!auth?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "missing auth" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const userClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: auth } } },
+    );
+    const { data: claims, error: claimsErr } = await userClient.auth.getClaims(
+      auth.replace("Bearer ", ""),
+    );
+    if (claimsErr || !claims?.claims?.sub) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     const body = (await req.json()) as Partial<Body>;
     const label = (body.label ?? "").toString().slice(0, 80).trim();
@@ -173,11 +185,7 @@ Deno.serve(async (req) => {
     }
     const preferredTheme = body.preferredTheme ?? "default";
 
-    const userClient = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: auth } } },
-    );
+
     const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
     // Determine org + makaton_licensed
