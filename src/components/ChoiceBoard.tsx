@@ -10,6 +10,7 @@ import { usePupilBoard } from "@/hooks/usePupilBoard";
 import BoardGrid from "@/components/board/BoardGrid";
 import BoardCell, { type BoardSymbol } from "@/components/board/BoardCell";
 import CoreStrip from "@/components/board/CoreStrip";
+import { useNextCardPredictions } from "@/hooks/useNextCardPredictions";
 import {
   Dialog,
   DialogContent,
