@@ -82,6 +82,7 @@ const ChoiceBoard = () => {
 
   // Root-level grid sourced from the DB via the typed hook (with local fallback).
   const { data: rootBoard } = usePupilBoard(currentPupilId, "root");
+  const { data: childBoard } = usePupilBoard(currentPupilId, activeCategory?.id ?? null);
 
   // Next-card personalisation: highlights the most likely follow-on cards.
   // No-ops when the active category isn't a real DB scene UUID.
@@ -269,11 +270,13 @@ const ChoiceBoard = () => {
   // Resolve items shown on the current scene.
   const items = useMemo(() => {
     if (activeCategory) {
-      return (dynamicItems.length > 0 ? dynamicItems : activeCategory.items).map(itemToSymbol);
+      if (childBoard?.gridItems?.length) return childBoard.gridItems;
+      if (dynamicItems.length > 0) return dynamicItems.map(itemToSymbol);
+      return activeCategory.items.map(itemToSymbol);
     }
     if (rootBoard?.gridItems?.length) return rootBoard.gridItems;
     return categories.map((c) => itemToSymbol(c));
-  }, [activeCategory, dynamicItems, rootBoard]);
+  }, [activeCategory, childBoard, dynamicItems, rootBoard]);
 
   const cols = 2;
   const rows = Math.ceil(items.length / cols);
@@ -326,7 +329,7 @@ const ChoiceBoard = () => {
         <SpeechBubble text={greeting} loading={greetingLoading} onDismiss={() => setGreeting("")} />
       )}
 
-      {activeCategory && dynamicLoading && (
+      {activeCategory && (dynamicLoading || (activeCategory && childBoard === undefined)) && (
         <BoardGrid rows={2} cols={2}>
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className={`bg-card ${highContrast ? "border-[6px] border-black" : "border-4 border-muted"} rounded-2xl shadow-md w-full aspect-square animate-pulse`} />

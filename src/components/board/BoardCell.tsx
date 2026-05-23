@@ -46,6 +46,7 @@ export const BoardCell = ({
   const sendingRef = useRef(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const isRemote = !!(symbol.imagePath && symbol.imagePath.startsWith("http"));
   const isSubItem = intent === "subitem";
 
@@ -94,7 +95,7 @@ export const BoardCell = ({
                 <img
                   src={symbol.imagePath}
                   alt={`${symbol.label} sign`}
-                  className="absolute inset-0 w-full h-full object-contain"
+                  className={`absolute inset-0 w-full h-full object-contain ${imgError ? "hidden" : ""}`}
                   onError={(e) => {
                     const img = e.currentTarget as HTMLImageElement;
                     const gh = githubSymbolUrl(symbol.label.toLowerCase());
@@ -102,20 +103,22 @@ export const BoardCell = ({
                       img.src = gh;
                       return;
                     }
-                    img.style.display = "none";
-                    img.parentElement
-                      ?.querySelector<HTMLDivElement>("[data-placeholder]")
-                      ?.removeAttribute("hidden");
+                    setImgError(true);
                   }}
                 />
               ) : null}
               <div
                 data-placeholder
-                hidden={!!symbol.imagePath ? true : undefined}
-                className={symbol.imagePath ? "hidden" : "w-3/4 h-3/4"}
+                hidden={!!symbol.imagePath || imgError ? true : undefined}
+                className={!!symbol.imagePath || imgError ? "hidden" : "w-3/4 h-3/4"}
               >
                 <MakatonPlaceholder label={symbol.label} />
               </div>
+              {imgError && (
+                <span className="text-foreground text-lg font-semibold text-center px-2">
+                  {symbol.label}
+                </span>
+              )}
             </button>
           </TooltipTrigger>
           <TooltipContent side="top" className="text-lg font-semibold px-4 py-2">
