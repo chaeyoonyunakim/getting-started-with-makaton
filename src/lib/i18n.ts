@@ -5,7 +5,7 @@ import LanguageDetector from "i18next-browser-languagedetector";
 const enGB = {
   translation: {
     app: {
-      name: "Choice Board",
+      name: "The Makaton",
       tagline: "A communication board for SEND classrooms",
     },
     nav: {
