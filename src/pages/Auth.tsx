@@ -51,8 +51,6 @@ const AuthPage = () => {
     ? "Enter your email and we'll send you a reset link."
     : "For Teaching Assistants and SENCOs";
 
-  if (loading) return null;
-  if (user) return <Navigate to="/" replace />;
 
   const validateFields = (nextMode = mode) => {
     const errs = validate(nextMode, email, password);
