@@ -8,6 +8,7 @@ import { StudentProvider } from "@/contexts/StudentContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import SettingsPage from "./pages/Settings";
 import ReviewSymbols from "./pages/ReviewSymbols";
 import SessionDetail from "./pages/SessionDetail";
@@ -25,6 +26,7 @@ const App = () => (
           <StudentProvider>
             <Routes>
               <Route path="/auth" element={<AuthPage />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route
                 path="/"
                 element={
