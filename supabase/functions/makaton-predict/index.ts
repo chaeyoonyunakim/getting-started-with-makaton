@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { sanitizePromptInput } from "../_shared/sanitizePromptInput.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -53,10 +54,10 @@ Deno.serve(async (req) => {
           Authorization: `Bearer ${API_TOKEN}`,
         },
         body: JSON.stringify({
-          child_name: typeof child_name === "string" ? child_name.slice(0, 50) : "Sam",
-          category: typeof category === "string" ? category.slice(0, 50) : "general",
+          child_name: sanitizePromptInput(child_name, { maxLength: 50, fallback: "Sam", allowPunctuation: true }),
+          category: sanitizePromptInput(category, { maxLength: 50, fallback: "general" }),
           history_log: Array.isArray(history_log) && history_log.length > 0
-            ? history_log.slice(0, 50)
+            ? history_log.slice(0, 50).map((h) => sanitizePromptInput(h, { maxLength: 50, fallback: "general" }))
             : ["general"],
           is_first_session: !!is_first_session,
         }),
