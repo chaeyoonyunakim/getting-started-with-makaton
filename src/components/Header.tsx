@@ -7,9 +7,9 @@ const Header = ({ profileChip }: { profileChip?: ReactNode }) => {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur">
       <div className="container flex h-14 items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-lg font-extrabold tracking-tight text-foreground">
+          <h1 className="text-lg font-extrabold tracking-tight text-foreground">
             Choice Board
-          </span>
+          </h1>
           {profileChip}
         </div>
         <Link

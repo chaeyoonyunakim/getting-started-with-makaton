@@ -64,11 +64,14 @@ const StudentProfileChip = () => {
             Enter a different student's name.
           </DialogDescription>
           <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
+            <label htmlFor="switch-student-name" className="sr-only">Student name</label>
             <input
+              id="switch-student-name"
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Student name"
+              aria-label="Student name"
               className="w-full rounded-xl border border-border bg-background px-4 py-3 text-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-4 focus:ring-ring/50"
             />
             <button
