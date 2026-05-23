@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Public read symbol cache" ON storage.objects;
