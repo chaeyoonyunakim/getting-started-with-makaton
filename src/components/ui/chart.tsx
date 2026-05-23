@@ -66,6 +66,9 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   }
 
   return (
+    // nosemgrep: react.security.audit.react-dangerouslysetinnerhtml
+    // Injects CSS custom properties into a <style> element only.
+    // Values are developer-authored ChartConfig color strings — no user input.
     <style
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)

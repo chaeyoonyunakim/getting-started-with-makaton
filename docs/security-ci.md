@@ -26,8 +26,9 @@ gitleaks detect --config .gitleaks.toml --redact
 
 # Static analysis
 docker run --rm -v "$PWD:/src" returntocorp/semgrep \
-  semgrep ci --config p/security-audit --config p/owasp-top-ten \
-             --config p/typescript --config p/react --config p/secrets
+  semgrep scan --config p/security-audit --config p/owasp-top-ten \
+               --config p/typescript --config p/react --config p/secrets \
+               --error --severity ERROR --severity WARNING
 
 # Tests + lint
 bun run test
