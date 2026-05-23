@@ -74,7 +74,7 @@ function extractTreePaths(block: string, rootHint: string): string[] {
 
     // Tree line: leading spaces + (│   )* + (├──|└──) + name[/] + optional comment
     const m = raw.match(
-      /^([ │]*)(?:├──|└──)\s+([A-Za-z0-9_.\-]+)(\/?)/,
+      /^([ │]*)(?:├──|└──)\s+([A-Za-z0-9_.-]+)(\/?)/,
     );
     if (!m) continue;
     const indent = m[1];
