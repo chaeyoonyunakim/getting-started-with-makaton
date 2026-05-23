@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import SeoHead from "@/components/SeoHead";
 
 interface QueueRow {
   id: string;
@@ -62,7 +63,13 @@ const ReviewSymbols = () => {
 
   return (
     <main className="container py-8 space-y-6">
+      <SeoHead
+        title="Review pending symbols — AAC Choice Board"
+        description="SENCo review queue for AI-generated Makaton symbols awaiting approval before joining the pupil library."
+        path="/review-symbols"
+      />
       <header className="flex items-center gap-3">
+
         <Link to="/settings" className="rounded-full p-2 hover:bg-muted" aria-label="Back to settings">
           <ArrowLeft className="w-5 h-5" />
         </Link>
