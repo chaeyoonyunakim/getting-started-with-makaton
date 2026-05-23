@@ -118,7 +118,7 @@ PYEOF
             /CREATE (OR REPLACE )?FUNCTION/ { buf=""; inblk=1 }
             inblk { buf = buf "\n" $0 }
             /\$\$;/ && inblk {
-              if (buf ~ /SECURITY[ \t]+DEFINER/ && buf !~ /set[ \t]+search_path/) {
+              if (buf ~ /SECURITY[ \t]+DEFINER/ && tolower(buf) !~ /set[ \t]+search_path/) {
                 print "OFFENDER:" buf
               }
               inblk=0

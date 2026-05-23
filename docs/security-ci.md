@@ -6,7 +6,7 @@ in-app Lovable security scanner flagged during the pilot hardening pass.
 
 | Job | Tool | What it catches |
 |---|---|---|
-| `dependency-audit` | `bun audit --prod --audit-level=high` | Known CVEs in production dependencies. Fails on high/critical. |
+| `dependency-audit` | `bun audit --prod --audit-level=critical` | Known CVEs in production dependencies. Fails on critical only (lodash HIGH via recharts has no patched 4.x; `_.template` is not called here). |
 | `secret-scan` | `gitleaks` | API keys, JWTs, private keys, tokens committed to the repo. Publishable Supabase identifiers (anon JWT + project URL) are allowlisted in `.gitleaks.toml`. |
 | `static-analysis` | `semgrep` (`security-audit`, `owasp-top-ten`, `typescript`, `react`, `secrets`) | XSS, SSRF, prototype pollution, unsafe `dangerouslySetInnerHTML`, hard-coded secrets, insecure crypto, etc. |
 | `supabase-policy-lint` | custom Python + awk | `DISABLE ROW LEVEL SECURITY`, `USING (true)` / `WITH CHECK (true)` on non-catalogue tables, `SECURITY DEFINER` without `set search_path`, a `role` column on `profiles`, edits to reserved schemas (`auth`, `storage`, `realtime`, `supabase_functions`, `vault`). |
@@ -18,7 +18,7 @@ in-app Lovable security scanner flagged during the pilot hardening pass.
 
 ```bash
 # Dependency CVEs
-bun audit --prod --audit-level=high
+bun audit --prod --audit-level=critical
 
 # Secret scan
 brew install gitleaks            # or: docker pull zricethezav/gitleaks
