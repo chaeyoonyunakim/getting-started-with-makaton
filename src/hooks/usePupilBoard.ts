@@ -34,9 +34,10 @@ interface CardRow {
  * - `sceneId` defaults to "root" (categories home screen).
  * - Falls back to local fixtures if the DB returns no rows (defensive).
  */
-export function usePupilBoard(pupilId: string | null, sceneId: string = "root") {
+export function usePupilBoard(pupilId: string | null, sceneId: string | null = "root") {
   return useQuery<PupilBoardData>({
     queryKey: ["pupilBoard", pupilId, sceneId],
+    enabled: sceneId !== null,
     queryFn: async () => {
       // Pull pupil settings (grid size) if we have an id; otherwise defaults.
       let gridSize = 6;
