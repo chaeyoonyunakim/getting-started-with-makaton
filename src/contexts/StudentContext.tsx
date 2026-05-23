@@ -1,8 +1,11 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 
 interface StudentContextType {
+  /** Display name of the selected pupil (shown in chip, sent to edge functions). */
   currentStudent: string;
-  setCurrentStudent: (name: string) => void;
+  /** UUID of the selected pupil row (null if using legacy localStorage flow). */
+  currentPupilId: string | null;
+  setCurrentStudent: (name: string, pupilId?: string | null) => void;
   isProfileSet: boolean;
 }
 
@@ -12,17 +15,26 @@ export const StudentProvider = ({ children }: { children: ReactNode }) => {
   const [currentStudent, setCurrentStudentRaw] = useState(() => {
     try { return localStorage.getItem("currentStudent") ?? ""; } catch { return ""; }
   });
+  const [currentPupilId, setCurrentPupilId] = useState<string | null>(() => {
+    try { return localStorage.getItem("currentPupilId"); } catch { return null; }
+  });
 
-  const setCurrentStudent = useCallback((name: string) => {
+  const setCurrentStudent = useCallback((name: string, pupilId: string | null = null) => {
     const trimmed = name.trim();
     setCurrentStudentRaw(trimmed);
-    try { localStorage.setItem("currentStudent", trimmed); } catch {}
+    setCurrentPupilId(pupilId);
+    try {
+      localStorage.setItem("currentStudent", trimmed);
+      if (pupilId) localStorage.setItem("currentPupilId", pupilId);
+      else localStorage.removeItem("currentPupilId");
+    } catch {}
   }, []);
 
   return (
     <StudentContext.Provider
       value={{
         currentStudent,
+        currentPupilId,
         setCurrentStudent,
         isProfileSet: currentStudent.length > 0,
       }}
