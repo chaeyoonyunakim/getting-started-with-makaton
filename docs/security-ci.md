@@ -6,11 +6,13 @@ in-app Lovable security scanner flagged during the pilot hardening pass.
 
 | Job | Tool | What it catches |
 |---|---|---|
-| `dependency-audit` | `bun audit --audit-level=high` | Known CVEs in production dependencies. Fails on high/critical. |
-| `secret-scan` | `gitleaks` | API keys, JWTs, private keys, tokens committed to the repo. Publishable Supabase identifiers are allowlisted in `.gitleaks.toml`. |
+| `dependency-audit` | `bun audit --prod --audit-level=high` | Known CVEs in production dependencies. Fails on high/critical. |
+| `secret-scan` | `gitleaks` | API keys, JWTs, private keys, tokens committed to the repo. Publishable Supabase identifiers (anon JWT + project URL) are allowlisted in `.gitleaks.toml`. |
 | `static-analysis` | `semgrep` (`security-audit`, `owasp-top-ten`, `typescript`, `react`, `secrets`) | XSS, SSRF, prototype pollution, unsafe `dangerouslySetInnerHTML`, hard-coded secrets, insecure crypto, etc. |
-| `supabase-policy-lint` | custom `grep`/`awk` | `DISABLE ROW LEVEL SECURITY`, `USING (true)` / `WITH CHECK (true)`, `SECURITY DEFINER` without `set search_path`, a `role` column on `profiles`, edits to reserved schemas (`auth`, `storage`, `realtime`, `supabase_functions`, `vault`). |
-| `unit-tests` | `vitest`, `eslint` | Regressions in board rendering, prediction blending, session state, depth routing. |
+| `supabase-policy-lint` | custom Python + awk | `DISABLE ROW LEVEL SECURITY`, `USING (true)` / `WITH CHECK (true)` on non-catalogue tables, `SECURITY DEFINER` without `set search_path`, a `role` column on `profiles`, edits to reserved schemas (`auth`, `storage`, `realtime`, `supabase_functions`, `vault`). |
+| `rls-regression` | `scripts/check-rls-regression.ts` | Key RLS guards (org scoping, `has_role` checks, sensitive-policy allowlist in `supabase/security/sensitive-policies.json`) are still present after each migration. |
+| `hibp-protection` | `scripts/check-hibp-protection.ts` | HIBP leaked-password protection remains enabled in Supabase Auth; no bypass patterns introduced in source. |
+| `unit-tests` | `vitest`, `eslint` | Regressions in board rendering, prediction blending, session state, depth routing, prompt-input sanitiser, and pupil-delete RLS. |
 
 ## Running locally
 

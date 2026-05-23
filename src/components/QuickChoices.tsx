@@ -54,7 +54,8 @@ const QuickChoices = ({ category, highContrast, historyLog, onSelect }: QuickCho
           (Array.isArray(data) ? data : []);
 
         const signs: PredictedSign[] = raw.slice(0, 3).map((s: unknown) => {
-          const label = typeof s === "string" ? s : s?.sign_name || s?.label || s?.name || String(s);
+          const obj = (s ?? {}) as { sign_name?: string; label?: string; name?: string };
+          const label = typeof s === "string" ? s : obj.sign_name || obj.label || obj.name || String(s);
           return { label, imagePath: resolveImage(label) };
         });
 

@@ -6,6 +6,33 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added
+- Repo-access hardening pass (PR #1, merged 2026-05-23):
+  - `.github/workflows/security.yml` jobs: `dependency-audit`,
+    `secret-scan` (gitleaks), `static-analysis` (semgrep),
+    `supabase-policy-lint`, `rls-regression`, `hibp-protection`,
+    `unit-tests` + `lint`.
+  - `scripts/check-rls-regression.ts` and
+    `scripts/check-hibp-protection.ts` guards.
+  - `.gitleaks.toml` allowlisting publishable Supabase identifiers.
+  - README "Credentials and secrets" section documenting why `.env`
+    (containing only `VITE_` publishable values) is intentionally
+    tracked.
+- SEO: Google Search Console verification meta tag in `index.html`;
+  site verified, registered, and sitemap submitted.
+
+### Changed
+- Dead code removed; ESLint clean across the repo.
+- TA notifications fully migrated to in-app realtime; the Slack
+  webhook path is gone.
+
+### Security
+- Roles confirmed to live in `public.user_roles` (never on
+  `profiles`), enforced via `public.has_role()` with pinned
+  `search_path`.
+- Edge Functions sanitise all prompt-bound user input via
+  `_shared/sanitizePromptInput.ts`.
+
 ## [0.1.0-pilot.1] — 2026-05-23
 
 ### Added

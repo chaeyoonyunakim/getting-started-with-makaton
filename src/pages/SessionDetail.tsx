@@ -111,7 +111,7 @@ const SessionDetail = () => {
           <Stat label="Selections" value={String(session.total_selections)} />
           <Stat label="Scenes" value={String(session.scene_count)} />
           <Stat label="Depth" value={String(session.depth_used ?? "—")} />
-          <Stat label="Duration" value={duration(session.started_at, session.ended_at)} />
+          <Stat label="Duration" value={duration(String(session.started_at), session.ended_at ? String(session.ended_at) : null)} />
         </section>
       )}
 
