@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      bandit_arms: {
+        Row: {
+          alpha: number
+          beta: number
+          card_id: string
+          scene_id: string
+          updated_at: string
+        }
+        Insert: {
+          alpha?: number
+          beta?: number
+          card_id: string
+          scene_id: string
+          updated_at?: string
+        }
+        Update: {
+          alpha?: number
+          beta?: number
+          card_id?: string
+          scene_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bandit_arms_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bandit_arms_scene_id_fkey"
+            columns: ["scene_id"]
+            isOneToOne: false
+            referencedRelation: "scenes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       card_modifiers: {
         Row: {
           card_id: string
@@ -40,6 +79,65 @@ export type Database = {
           {
             foreignKeyName: "card_modifiers_card_id_fkey"
             columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      card_selections: {
+        Row: {
+          created_at: string
+          from_card_id: string | null
+          id: string
+          pupil_id: string
+          scene_id: string
+          session_id: string
+          to_card_id: string
+        }
+        Insert: {
+          created_at?: string
+          from_card_id?: string | null
+          id?: string
+          pupil_id: string
+          scene_id: string
+          session_id: string
+          to_card_id: string
+        }
+        Update: {
+          created_at?: string
+          from_card_id?: string | null
+          id?: string
+          pupil_id?: string
+          scene_id?: string
+          session_id?: string
+          to_card_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "card_selections_from_card_id_fkey"
+            columns: ["from_card_id"]
+            isOneToOne: false
+            referencedRelation: "cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "card_selections_pupil_id_fkey"
+            columns: ["pupil_id"]
+            isOneToOne: false
+            referencedRelation: "pupils"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "card_selections_scene_id_fkey"
+            columns: ["scene_id"]
+            isOneToOne: false
+            referencedRelation: "scenes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "card_selections_to_card_id_fkey"
+            columns: ["to_card_id"]
             isOneToOne: false
             referencedRelation: "cards"
             referencedColumns: ["id"]
@@ -105,6 +203,68 @@ export type Database = {
           region?: string | null
         }
         Relationships: []
+      }
+      predictions_log: {
+        Row: {
+          chosen_id: string | null
+          current_card_id: string | null
+          prediction_id: string
+          pupil_id: string
+          scene_id: string
+          session_id: string
+          top3: Json
+          ts: string
+        }
+        Insert: {
+          chosen_id?: string | null
+          current_card_id?: string | null
+          prediction_id?: string
+          pupil_id: string
+          scene_id: string
+          session_id: string
+          top3: Json
+          ts?: string
+        }
+        Update: {
+          chosen_id?: string | null
+          current_card_id?: string | null
+          prediction_id?: string
+          pupil_id?: string
+          scene_id?: string
+          session_id?: string
+          top3?: Json
+          ts?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "predictions_log_chosen_id_fkey"
+            columns: ["chosen_id"]
+            isOneToOne: false
+            referencedRelation: "cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "predictions_log_current_card_id_fkey"
+            columns: ["current_card_id"]
+            isOneToOne: false
+            referencedRelation: "cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "predictions_log_pupil_id_fkey"
+            columns: ["pupil_id"]
+            isOneToOne: false
+            referencedRelation: "pupils"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "predictions_log_scene_id_fkey"
+            columns: ["scene_id"]
+            isOneToOne: false
+            referencedRelation: "scenes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -294,7 +454,46 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      mv_pupil_transitions: {
+        Row: {
+          count: number | null
+          from_card_id: string | null
+          last_seen_at: string | null
+          pupil_id: string | null
+          scene_id: string | null
+          to_card_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "card_selections_from_card_id_fkey"
+            columns: ["from_card_id"]
+            isOneToOne: false
+            referencedRelation: "cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "card_selections_pupil_id_fkey"
+            columns: ["pupil_id"]
+            isOneToOne: false
+            referencedRelation: "pupils"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "card_selections_scene_id_fkey"
+            columns: ["scene_id"]
+            isOneToOne: false
+            referencedRelation: "scenes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "card_selections_to_card_id_fkey"
+            columns: ["to_card_id"]
+            isOneToOne: false
+            referencedRelation: "cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       current_user_org: { Args: never; Returns: string }
