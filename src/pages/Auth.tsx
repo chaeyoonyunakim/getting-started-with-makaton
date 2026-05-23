@@ -43,7 +43,13 @@ const AuthPage = () => {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4">
+      <SeoHead
+        title="Sign in — AAC Choice Board for SEND classrooms"
+        description="Teaching Assistants and SENCOs sign in to manage Makaton pupil profiles and start communication sessions."
+        path="/auth"
+      />
       <div className="w-full max-w-sm bg-card rounded-2xl shadow-lg p-8 flex flex-col gap-6 border border-border">
+
         <header className="text-center">
           <h1 className="text-2xl font-bold text-foreground">
             {mode === "signin" ? "Sign in" : "Create account"}
