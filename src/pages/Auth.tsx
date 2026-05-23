@@ -121,10 +121,15 @@ const AuthPage = () => {
     return "Sign up";
   }, [mode]);
 
+  // Compute redirect/loading as values — never early-return before hooks.
+  // All hooks above run unconditionally on every render.
+  const shouldRedirect = !loading && !!user;
+
   if (loading) return null;
-  if (user) return <Navigate to="/" replace />;
+  if (shouldRedirect) return <Navigate to="/" replace />;
 
   return (
+
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <SeoHead
         title="Sign in — AAC Choice Board for SEND classrooms"
