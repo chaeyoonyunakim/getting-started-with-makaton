@@ -8,7 +8,7 @@ const Header = ({ profileChip }: { profileChip?: ReactNode }) => {
       <div className="container flex h-14 items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-lg font-extrabold tracking-tight text-foreground">
-            Choice Board
+            The Makaton
           </h1>
           {profileChip}
         </div>
