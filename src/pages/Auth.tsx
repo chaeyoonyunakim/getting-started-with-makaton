@@ -51,8 +51,6 @@ const AuthPage = () => {
     ? "Enter your email and we'll send you a reset link."
     : "For Teaching Assistants and SENCOs";
 
-  if (loading) return null;
-  if (user) return <Navigate to="/" replace />;
 
   const validateFields = (nextMode = mode) => {
     const errs = validate(nextMode, email, password);
@@ -122,6 +120,9 @@ const AuthPage = () => {
     if (mode === "signin") return "Sign in";
     return "Sign up";
   }, [mode]);
+
+  if (loading) return null;
+  if (user) return <Navigate to="/" replace />;
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
