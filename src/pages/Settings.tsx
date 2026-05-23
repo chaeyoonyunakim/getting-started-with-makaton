@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useStudent } from "@/contexts/StudentContext";
 import DepthSelector from "@/components/settings/DepthSelector";
+import AttributionFooter from "@/components/settings/AttributionFooter";
 import type { Depth } from "@/lib/depthRouter";
 import { toast } from "sonner";
 
