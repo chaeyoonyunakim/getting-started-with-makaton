@@ -108,7 +108,7 @@ export const BoardCell = ({
                       const { data } = await supabase.functions.invoke("resolveSymbol", {
                         body: { label: symbol.label },
                       });
-                      const url = (data as { url?: string } | null)?.url;
+                      const url = (data as { resolved?: { url?: string } } | null)?.resolved?.url;
                       if (url) {
                         setImgSrc(url);
                       } else {

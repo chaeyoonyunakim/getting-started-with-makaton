@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import SeoHead from "@/components/SeoHead";
 
 interface Selection {
   id: string;
@@ -87,7 +88,13 @@ const SessionDetail = () => {
 
   return (
     <main className="container py-6 space-y-6 max-w-4xl">
+      <SeoHead
+        title="Session detail — AAC Choice Board"
+        description="Review a pupil session: card selections, dwell times, predictions, and golden-sign awards."
+        path={`/sessions/${id ?? ""}`}
+      />
       <header className="flex items-center gap-3">
+
         <Link to="/settings" className="rounded-full p-2 hover:bg-muted" aria-label="Back">
           <ArrowLeft className="w-5 h-5" />
         </Link>

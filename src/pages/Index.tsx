@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import SeoHead from "@/components/SeoHead";
 import ChoiceBoard from "@/components/ChoiceBoard";
 import StudentSetupModal from "@/components/StudentSetupModal";
 import StudentProfileChip from "@/components/StudentProfileChip";
@@ -35,12 +36,18 @@ const BoardWithCore = () => {
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SeoHead
+        title="AAC Choice Board — Makaton communication for SEND pupils"
+        description="Picture-led Makaton choice board for SEND classrooms. High-contrast cards, predictive suggestions, and SENCo-managed pupil profiles."
+        path="/"
+      />
       <Header profileChip={<StudentProfileChip />} />
       <BoardWithCore />
       <StudentSetupModal />
     </div>
   );
 };
+
 
 
 export default Index;
