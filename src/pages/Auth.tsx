@@ -3,6 +3,8 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import SeoHead from "@/components/SeoHead";
+
 
 const AuthPage = () => {
   const { user, loading } = useAuth();
