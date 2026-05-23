@@ -122,6 +122,17 @@ jobs:
 
           exit $fail
 
+  rls-regression:
+    name: Supabase RLS regression guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Replay migrations and verify sensitive RLS guards
+        run: bun run scripts/check-rls-regression.ts
+
   unit-tests:
     name: Vitest smoke tests
     runs-on: ubuntu-latest

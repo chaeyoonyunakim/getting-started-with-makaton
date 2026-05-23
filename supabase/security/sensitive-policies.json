@@ -1,0 +1,61 @@
+{
+  "$comment": "Baseline guards for sensitive RLS policies. The CI script (scripts/check-rls-regression.ts) replays all migrations in lexicographic order, reconstructs the latest CREATE POLICY definition for each (schema, table, command) tuple, and asserts that every required token appears. Any DROP POLICY without a replacement that still satisfies these guards fails the build.",
+  "rules": [
+    {
+      "table": "public.pupils",
+      "command": "DELETE",
+      "requireAll": ["has_role(", "'senco'", "current_user_org()"],
+      "forbid": ["USING (true)", "USING ( true )"],
+      "reason": "Only SENCOs in the caller's org may hard-delete a pupil (GDPR right-to-erasure)."
+    },
+    {
+      "table": "public.profiles",
+      "command": "UPDATE",
+      "requireAll": ["auth.uid()"],
+      "forbid": ["USING (true)", "WITH CHECK (true)"],
+      "reason": "Users may only update their own profile; role/org changes must stay locked down."
+    },
+    {
+      "table": "public.org_settings",
+      "command": "UPDATE",
+      "requireAll": ["has_role(", "'senco'", "current_user_org()"],
+      "reason": "Only SENCOs may change org-wide settings (retention, reward thresholds)."
+    },
+    {
+      "table": "public.org_settings",
+      "command": "INSERT",
+      "requireAll": ["has_role(", "'senco'", "current_user_org()"],
+      "reason": "Only SENCOs may seed org settings."
+    },
+    {
+      "table": "public.org_symbol_packs",
+      "command": "DELETE",
+      "requireAll": ["has_role(", "'senco'", "current_user_org()"],
+      "reason": "Symbol pack removal is destructive and SENCO-only."
+    },
+    {
+      "table": "public.org_symbol_packs",
+      "command": "UPDATE",
+      "requireAll": ["has_role(", "'senco'", "current_user_org()"],
+      "reason": "Symbol pack edits are SENCO-only."
+    },
+    {
+      "table": "public.org_symbol_packs",
+      "command": "INSERT",
+      "requireAll": ["has_role(", "'senco'", "current_user_org()"],
+      "reason": "Symbol pack additions are SENCO-only."
+    },
+    {
+      "table": "public.symbol_review_queue",
+      "command": "UPDATE",
+      "requireAll": ["has_role(", "'senco'", "current_user_org()"],
+      "reason": "Approving/rejecting AI-generated symbols is SENCO-only."
+    },
+    {
+      "table": "public.symbol_review_queue",
+      "command": "DELETE",
+      "requireAll": ["has_role(", "'senco'", "current_user_org()"],
+      "reason": "Purging review-queue entries is SENCO-only."
+    }
+  ]
+}
