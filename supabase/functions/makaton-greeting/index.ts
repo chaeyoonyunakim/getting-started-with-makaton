@@ -44,7 +44,7 @@ Deno.serve(async (req) => {
 
   try {
     const { category } = await req.json();
-    const safeCategory = typeof category === "string" ? category.slice(0, 50) : "general";
+    const safeCategory = sanitizePromptInput(category, { maxLength: 50, fallback: "general" });
 
     const res = await fetch(
       "https://runtime.codewords.ai/run/send_tip_generator_20466b84/",
