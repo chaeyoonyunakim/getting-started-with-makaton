@@ -6,6 +6,21 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.2.1-pilot.1] — 2026-05-23
+
+### Fixed
+- CI `static-analysis` job was failing immediately: `semgrep ci` in semgrep
+  v1.x does not support `--error` / `--severity` flags (cloud-only subcommand).
+  Switched to `semgrep scan` which supports all required flags offline.
+- CI workflow YAML was technically invalid: the inline Python heredoc in the
+  `supabase-policy-lint` step had unindented content that exits the YAML
+  literal block early, causing YAML parse errors. Extracted to
+  `scripts/check-rls-policies.py` so the workflow YAML is unambiguously valid.
+- Added `.semgrepignore` to exclude `.env` (publishable anon JWT, not a secret)
+  and Lovable-managed auto-generated files from semgrep scanning.
+- Suppressed `dangerouslySetInnerHTML` semgrep finding in `chart.tsx`
+  (shadcn/ui chart injects CSS custom properties from dev-authored config only).
+
 ## [0.2.0-pilot.1] — 2026-05-23
 
 ### Added
