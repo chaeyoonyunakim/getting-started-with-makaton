@@ -2,73 +2,123 @@
 
 A digital choice board for non-verbal and emerging-verbal pupils in UK
 SEN schools. Built mobile-first and tablet-optimised (iPad 10.2"
-primary). Symbol artwork is fetched from licensed sources with a
+primary). Symbol artwork is fetched from licensed open sources with a
 fallback chain that respects per-school licensing.
 
-This README focuses on **pilot-readiness**: lawful basis, retention,
-sub-processors, and how to handle Subject Access Requests (SARs) and
-Right-to-Erasure requests. Engineering setup is documented inline.
+This README focuses on **pilot-readiness**: architecture, lawful basis,
+retention, sub-processors, and how to handle Subject Access Requests
+(SARs) and Right-to-Erasure requests.
 
 ---
+
+## Tech stack
+
+- **Frontend**: React 18 + Vite 5 + TypeScript 5, Tailwind CSS v3,
+  shadcn/ui, TanStack Query, `react-i18next` (en-GB).
+- **Backend**: Supabase (managed Postgres, Auth, Storage, Edge
+  Functions on Deno) — provisioned via Lovable Cloud.
+- **AuthN/AuthZ**: Supabase Auth (email + password). Authorisation
+  enforced by Row-Level Security on every table, scoped through
+  `current_user_org()` and a separate `user_roles` table for SENCo /
+  TA role checks (no role column on `profiles`).
+- **Prediction engine**: Pure-SQL/TypeScript Markov + Thompson-sampling
+  bandit running inside the `predictNextCards` Edge Function. **No
+  external LLM is called at runtime.** Nightly bandit update via
+  `updateBanditNightly`.
+- **Symbol sourcing**: ARASAAC REST API (primary) → Mulberry Symbols
+  CDN (lazy fetch) → Sclera (high-contrast only) → optional AI
+  synthesis (off by default). See **Symbol licensing** below.
+- **Realtime**: Supabase Realtime channel on the `ta_notifications`
+  table for in-app TA alerts (no external webhooks).
+- **Testing**: Vitest smoke tests for board rendering, prediction
+  blending, session state, and depth routing.
+
+## Edge Functions
+
+| Function | Purpose |
+|---|---|
+| `predictNextCards` | Markov + bandit Top-3 prediction. No LLM. |
+| `updateBanditNightly` | Recomputes bandit posteriors from yesterday's selections. |
+| `resolveSymbol` | Licence-aware symbol fallback chain (ARASAAC → Mulberry → Sclera → AI). |
+| `makaton-notifier` | Writes in-app TA notifications to `ta_notifications`. |
+| `purgeOldSelections` | Nightly retention enforcement. |
+| `exportPupilData` | Subject Access Request export (JSON). |
+| `deletePupil` | Right-to-Erasure hard delete. |
+| `health`, `version` | Liveness and build metadata. |
+
+## Symbol licensing
+
+Choice Board never embeds proprietary symbol sets in its repository.
+Symbols are fetched at runtime and cached, with the source, licence,
+and attribution stored on every `cards` row.
+
+| Source | Licence | Required attribution |
+|---|---|---|
+| **ARASAAC** (primary) | CC BY-NC-SA 4.0 | *Symbols author: Sergio Palao. Origin: ARASAAC (https://arasaac.org). Licence: Creative Commons (BY-NC-SA).* Property of the Government of Aragón. |
+| **Mulberry Symbols** (fallback, lazy-fetched from CDN) | CC BY-SA 2.0 UK | *Mulberry Symbols by Garry Paxton. Licensed under CC BY-SA 2.0 UK.* |
+| **Sclera Symbols** (high-contrast fallback) | CC BY-NC 4.0 | *Sclera Symbols — https://www.sclera.be. Licensed under CC BY-NC.* |
+| **AI-synthesised** | Internal review only | Feature-flagged behind `ENABLE_AI_SYMBOLS` (default **false**). When disabled, the resolver returns `null` silently and the UI falls back to the placeholder. |
+| **School-supplied licensed packs** | Per school's own licence | Stored in `org_symbol_packs` and scoped by `org_id`. Used only when the pupil's organisation has the appropriate licence. |
+
+A live attribution footer (`AttributionFooter`) on the SENCo dashboard
+lists every licence in use plus per-source counts. The UI does not use
+the word "Makaton" anywhere by default — only pupils flagged
+`makaton_licensed` see Makaton-branded packs.
 
 ## Lawful basis (UK GDPR)
 
 Children's personal data processed by Choice Board (pupil names,
 selections, predictions, session metadata) is processed under:
 
-- **Article 6(1)(e)** — *processing is necessary for the performance
-  of a task carried out in the public interest or in the exercise of
-  official authority vested in the controller.* The controller is the
+- **Article 6(1)(e)** — *processing necessary for the performance of a
+  task carried out in the public interest.* The controller is the
   pilot school (or MAT); Choice Board acts as **processor**.
-- **Article 9(2)(g)** — *processing is necessary for reasons of
+- **Article 9(2)(g)** — *processing necessary for reasons of
   substantial public interest, on the basis of UK domestic law*
   (Children and Families Act 2014; Education Act 1996) — where
-  selection patterns may reveal health information (e.g. distress
-  expressed via the "feelings" scene).
+  selection patterns may reveal health information.
 
-The Data Protection Impact Assessment in
-[`docs/DPIA.md`](DPIA.md) documents the necessity and proportionality
-analysis. A draft Article 28 processor agreement is in
-[`docs/DPA.md`](DPA.md).
+See [`docs/DPIA.md`](docs/DPIA.md) and the draft Article 28 processor
+agreement in [`docs/DPA.md`](docs/DPA.md).
 
 ## Retention
 
 | Data class | Default retention | Configurable per-school? |
 |---|---|---|
-| Raw `card_selections` rows (with `dwell_ms`, `predicted_in_top3`) | 90 days | Yes — `org_settings.retention_days` |
-| Aggregated `mv_pupil_transitions` counts (no individual selection rows) | Indefinite (anonymous to the pupil) | No |
+| Raw `card_selections` (with `dwell_ms`, `predicted_in_top3`) | 90 days | Yes — `org_settings.retention_days` |
+| Aggregated `mv_pupil_transitions` counts | Indefinite (anonymous to the pupil) | No |
 | `sessions` summary rows | 90 days | Yes |
 | `predictions_log` (Top-3 + chosen) | 90 days | Yes |
 | `ta_notifications` | 30 days | Hard-coded |
-| AI-generated symbols pending review (`symbol_review_queue`) | Until approved/rejected | n/a |
+| AI symbols pending review (`symbol_review_queue`) | Until approved/rejected | n/a |
 
-The `purgeOldSelections` Edge Function runs nightly. Setting
-`retention_days` to `0` disables retention beyond aggregation.
+`purgeOldSelections` runs nightly. Setting `retention_days` to `0`
+disables retention beyond aggregation.
 
 ## Sub-processors
 
 | Sub-processor | Purpose | UK/EU adequacy | Data shared |
 |---|---|---|---|
-| **Supabase Inc.** (eu-west-2) | Managed Postgres, auth, edge functions, object storage | EU data residency configured | All pupil and session data |
-| **ARASAAC CDN** (Aragón Government, ES) | Static symbol artwork | EU | Free-text label only (e.g. "apple") — no pupil identifiers |
-| **Mulberry Symbols CDN** | Static symbol artwork | UK origin, served via CDN | Label only |
-| **Lovable AI Gateway → Nano Banana** | AI symbol synthesis (feature-flagged behind `ENABLE_AI_SYMBOLS`, default OFF) | Subject to gateway terms | Label only — disabled by default |
+| **Supabase Inc.** (eu-west-2) | Managed Postgres, Auth, Edge Functions, Storage | EU data residency | All pupil and session data |
+| **ARASAAC** (Aragón Government, ES) | Symbol REST API + static CDN | EU | Free-text label only (e.g. "apple") — no pupil identifiers |
+| **Mulberry Symbols CDN** (jsDelivr) | Static SVG artwork, lazy-fetched | UK origin via CDN | Label only |
+| **Sclera Symbols CDN** | Static PNG artwork (high-contrast theme) | EU | Label only |
+| **Lovable AI Gateway** | Optional AI symbol synthesis, off by default | Subject to gateway terms | Label only — disabled unless `ENABLE_AI_SYMBOLS=true` |
 
-No selection or pupil data is ever sent to a third party.
+No selection, pupil, or session data is sent to any third party. There
+is no Slack, no GitHub, and no analytics pixel integration.
 
 ## SAR and Right-to-Erasure procedure
 
-1. SENCo verifies the requester's identity (parent/carer with parental
-   responsibility, or pupil if competent).
+1. SENCo verifies the requester's identity.
 2. SENCo signs in and navigates to **Settings → Pupils**.
-3. **SAR**: click "Export data" — calls the `exportPupilData` Edge
-   Function and downloads a JSON archive of every row referencing that
-   pupil. Deliver to requester via the school's standard SAR channel
-   within **one calendar month** (UK GDPR Art. 12(3)).
-4. **Erasure**: click "Delete pupil" — calls the `deletePupil` Edge
-   Function. Hard-deletes the pupil row and cascades to selections,
-   sessions, predictions, and notifications. Aggregated counts in
-   `mv_pupil_transitions` are also removed.
+3. **SAR**: "Export data" calls `exportPupilData` and downloads a JSON
+   archive of every row referencing that pupil. Deliver within **one
+   calendar month** (UK GDPR Art. 12(3)).
+4. **Erasure**: "Delete pupil" calls `deletePupil`, hard-deleting the
+   pupil row and cascading to selections, sessions, predictions, and
+   notifications. Aggregated counts in `mv_pupil_transitions` are also
+   removed.
 5. SENCo records the request in the school's information-rights
    register.
 
@@ -78,19 +128,18 @@ RLS — a SENCo at one school cannot export or delete pupils at another.
 ## Accessibility
 
 - WCAG 2.2 AA targeted; AAA contrast (≥ 7:1) on default theme.
-- Tap targets ≥ 64 × 64 px (exceeds the 44 px WCAG floor).
+- Tap targets ≥ 64 × 64 px.
 - High-contrast yellow-on-black theme (≈ 19.5:1) for low-vision users.
 - `prefers-reduced-motion` respected; in-app **Reduce motion** toggle.
 - Screen-reader tested with VoiceOver (iPadOS) and NVDA (Windows).
-- Full keyboard navigation; visible focus rings on every interactive
-  element (`focus:ring-4 focus:ring-ring/50`).
+- Full keyboard navigation; visible focus rings (`focus:ring-4
+  focus:ring-ring/50`).
 
 ## Internationalisation
 
-UI strings are wired through `react-i18next` with **en-GB** as the
-default and only currently-shipping locale. The `pupils.home_language`
-column captures a pupil's home language for SENCo reference; it does
-not change the interface yet.
+UI strings flow through `react-i18next` with **en-GB** as the default
+and currently the only shipping locale. The `pupils.home_language`
+column records a pupil's home language for SENCo reference.
 
 ## Observability
 
@@ -104,5 +153,7 @@ not change the interface yet.
 
 - `bun install`
 - `bun run dev`
-- `bun test` — Vitest
-- See `CHANGELOG.md` for release history.
+- `bunx vitest run` — Vitest smoke tests
+- See [`CHANGELOG.md`](CHANGELOG.md) for release history and
+  [`docs/pilot-smoke-test.md`](docs/pilot-smoke-test.md) for the TA
+  manual verification checklist.
