@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import type { Depth } from "@/lib/depthRouter";
 import { toast } from "sonner";
+import SeoHead from "@/components/SeoHead";
 
 const SettingsPage = () => {
   const { currentPupilId, currentStudent } = useStudent();
