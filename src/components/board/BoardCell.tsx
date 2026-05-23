@@ -93,7 +93,7 @@ export const BoardCell = ({
               {symbol.imagePath ? (
                 <img
                   src={symbol.imagePath}
-                  alt={`${symbol.label} Makaton sign`}
+                  alt={`${symbol.label} sign`}
                   className="absolute inset-0 w-full h-full object-contain"
                   onError={(e) => {
                     const img = e.currentTarget as HTMLImageElement;
