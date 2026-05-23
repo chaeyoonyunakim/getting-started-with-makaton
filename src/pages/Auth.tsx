@@ -121,14 +121,13 @@ const AuthPage = () => {
     return "Sign up";
   }, [mode]);
 
-  // Compute redirect/loading as values — never early-return before hooks.
   // All hooks above run unconditionally on every render.
-  const shouldRedirect = !loading && !!user;
-
-  if (loading) return null;
-  if (shouldRedirect) return <Navigate to="/" replace />;
-
+  // Loading and redirect states are handled via conditional rendering below,
+  // never via early returns — this keeps hook order stable.
   return (
+    <>
+      {loading ? null : !user ? (
+
 
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <SeoHead
