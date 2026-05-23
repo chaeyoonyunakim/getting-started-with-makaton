@@ -421,6 +421,7 @@ export type Database = {
           display_name: string
           ehcp_categories: string[] | null
           grid_size: number
+          home_language: string | null
           id: string
           makaton_licensed: boolean
           makaton_stage: number | null
@@ -433,6 +434,7 @@ export type Database = {
           display_name: string
           ehcp_categories?: string[] | null
           grid_size?: number
+          home_language?: string | null
           id?: string
           makaton_licensed?: boolean
           makaton_stage?: number | null
@@ -445,6 +447,7 @@ export type Database = {
           display_name?: string
           ehcp_categories?: string[] | null
           grid_size?: number
+          home_language?: string | null
           id?: string
           makaton_licensed?: boolean
           makaton_stage?: number | null
