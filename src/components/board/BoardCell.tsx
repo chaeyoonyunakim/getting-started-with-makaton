@@ -3,7 +3,7 @@ import { Check, CloudUpload, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import MakatonPlaceholder from "@/components/MakatonPlaceholder";
-import { githubSymbolUrl } from "@/data/makaton";
+
 import {
   Tooltip,
   TooltipContent,
@@ -47,6 +47,8 @@ export const BoardCell = ({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [imgSrc, setImgSrc] = useState<string | undefined>(symbol.imagePath);
+  const resolveAttemptedRef = useRef(false);
   const isRemote = !!(symbol.imagePath && symbol.imagePath.startsWith("http"));
   const isSubItem = intent === "subitem";
 
@@ -93,17 +95,28 @@ export const BoardCell = ({
             >
               {symbol.imagePath ? (
                 <img
-                  src={symbol.imagePath}
+                  src={imgSrc}
                   alt={`${symbol.label} sign`}
                   className={`absolute inset-0 w-full h-full object-contain ${imgError ? "hidden" : ""}`}
-                  onError={(e) => {
-                    const img = e.currentTarget as HTMLImageElement;
-                    const gh = githubSymbolUrl(symbol.label.toLowerCase());
-                    if (!img.src.includes("raw.githubusercontent.com") && !img.src.startsWith("http")) {
-                      img.src = gh;
+                  onError={async () => {
+                    if (resolveAttemptedRef.current) {
+                      setImgError(true);
                       return;
                     }
-                    setImgError(true);
+                    resolveAttemptedRef.current = true;
+                    try {
+                      const { data } = await supabase.functions.invoke("resolveSymbol", {
+                        body: { label: symbol.label },
+                      });
+                      const url = (data as { url?: string } | null)?.url;
+                      if (url) {
+                        setImgSrc(url);
+                      } else {
+                        setImgError(true);
+                      }
+                    } catch {
+                      setImgError(true);
+                    }
                   }}
                 />
               ) : null}
