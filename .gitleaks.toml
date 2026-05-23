@@ -1,0 +1,23 @@
+# Gitleaks config for Choice Board
+# Allowlist values that are publishable by design (Supabase anon key, project URL).
+title = "Choice Board gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Publishable Supabase identifiers and example/test fixtures"
+paths = [
+  '''(^|/)\.env$''',
+  '''src/integrations/supabase/client\.ts''',
+  '''README\.md''',
+  '''docs/''',
+  '''src/test/''',
+  '''.*\.test\.(ts|tsx)$''',
+]
+regexes = [
+  # Supabase anon (publishable) JWTs are safe to commit
+  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+''',
+  # Supabase project URLs
+  '''https://[a-z0-9]+\.supabase\.co''',
+]

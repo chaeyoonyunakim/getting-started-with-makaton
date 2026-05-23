@@ -1,0 +1,135 @@
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Weekly re-scan to catch newly disclosed advisories
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  dependency-audit:
+    name: Dependency audit (bun)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install
+        run: bun install --frozen-lockfile
+      - name: Audit dependencies (high/critical fail)
+        run: |
+          # bun audit exits non-zero on any advisory; gate on high+
+          bun audit --prod --audit-level=high
+
+  secret-scan:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "true"
+
+  static-analysis:
+    name: Static analysis (semgrep)
+    runs-on: ubuntu-latest
+    container: returntocorp/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Semgrep (security audit + OWASP + typescript + react)
+        run: |
+          semgrep ci \
+            --config p/security-audit \
+            --config p/owasp-top-ten \
+            --config p/typescript \
+            --config p/react \
+            --config p/secrets \
+            --error \
+            --severity ERROR \
+            --severity WARNING
+
+  supabase-policy-lint:
+    name: Supabase RLS / migration lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for risky SQL patterns in migrations
+        shell: bash
+        run: |
+          set -euo pipefail
+          MIG_DIR="supabase/migrations"
+          if [ ! -d "$MIG_DIR" ]; then
+            echo "No migrations directory; skipping."
+            exit 0
+          fi
+
+          fail=0
+
+          echo "::group::Disabled RLS"
+          if grep -RInE 'DISABLE\s+ROW\s+LEVEL\s+SECURITY' "$MIG_DIR"; then
+            echo "::error::Migrations disable RLS. This is not allowed."
+            fail=1
+          fi
+          echo "::endgroup::"
+
+          echo "::group::Overly permissive policies (USING (true) / WITH CHECK (true))"
+          if grep -RInE 'USING\s*\(\s*true\s*\)|WITH\s+CHECK\s*\(\s*true\s*\)' "$MIG_DIR"; then
+            echo "::error::Found policies with USING/WITH CHECK (true). Scope to the caller."
+            fail=1
+          fi
+          echo "::endgroup::"
+
+          echo "::group::SECURITY DEFINER functions missing search_path"
+          # Any function declared SECURITY DEFINER must also pin search_path.
+          awk '
+            /CREATE (OR REPLACE )?FUNCTION/ { buf=""; inblk=1 }
+            inblk { buf = buf "\n" $0 }
+            /\$\$;/ && inblk {
+              if (buf ~ /SECURITY[ \t]+DEFINER/ && buf !~ /set[ \t]+search_path/) {
+                print "OFFENDER:" buf
+              }
+              inblk=0
+            }
+          ' "$MIG_DIR"/*.sql | grep -q '^OFFENDER:' && {
+            echo "::error::SECURITY DEFINER function without 'set search_path = ...'."
+            fail=1
+          } || true
+          echo "::endgroup::"
+
+          echo "::group::Role column on profiles (privilege escalation risk)"
+          if grep -RInE 'ALTER\s+TABLE\s+(public\.)?profiles[^;]*ADD\s+COLUMN\s+role|CREATE\s+TABLE\s+(public\.)?profiles[^;]*\brole\b' "$MIG_DIR"; then
+            echo "::error::A 'role' column on profiles enables privilege escalation. Use user_roles + has_role()."
+            fail=1
+          fi
+          echo "::endgroup::"
+
+          echo "::group::Edits to reserved schemas"
+          if grep -RInE '\b(auth|storage|realtime|supabase_functions|vault)\.' "$MIG_DIR" \
+              | grep -vE 'auth\.uid\(\)|auth\.users|auth\.jwt\(\)|references\s+auth\.users'; then
+            echo "::warning::Migrations reference reserved schemas. Verify this is intentional."
+          fi
+          echo "::endgroup::"
+
+          exit $fail
+
+  unit-tests:
+    name: Vitest smoke tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run test
+      - run: bun run lint
