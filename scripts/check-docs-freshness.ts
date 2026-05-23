@@ -22,7 +22,7 @@
  * Run locally:  bun run scripts/check-docs-freshness.ts
  */
 
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const ROOT = process.cwd();
@@ -74,7 +74,7 @@ function extractTreePaths(block: string, rootHint: string): string[] {
 
     // Tree line: leading spaces + (│   )* + (├──|└──) + name[/] + optional comment
     const m = raw.match(
-      /^([ │]*)(?:├──|└──)\s+([A-Za-z0-9_.\-]+)(\/?)/,
+      /^([ │]*)(?:├──|└──)\s+([A-Za-z0-9_.-]+)(\/?)/,
     );
     if (!m) continue;
     const indent = m[1];
@@ -136,9 +136,7 @@ function listMigrationTables(): Set<string> {
   const out = new Set<string>();
   let files: string[];
   try {
-    files = (require("node:fs").readdirSync(dir) as string[]).filter((f) =>
-      f.endsWith(".sql"),
-    );
+    files = readdirSync(dir).filter((f) => f.endsWith(".sql"));
   } catch {
     return out;
   }
