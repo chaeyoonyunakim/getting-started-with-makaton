@@ -83,6 +83,14 @@ const ChoiceBoard = () => {
   // Root-level grid sourced from the DB via the typed hook (with local fallback).
   const { data: rootBoard } = usePupilBoard(currentPupilId, "root");
 
+  // Next-card personalisation: highlights the most likely follow-on cards.
+  // No-ops when the active category isn't a real DB scene UUID.
+  const { topIds: predictedIds } = useNextCardPredictions(
+    currentPupilId,
+    activeCategory?.id ?? null,
+    null,
+  );
+
   const handleFullReset = useCallback(() => {
     setActiveCategory(null);
     setGreeting("");
