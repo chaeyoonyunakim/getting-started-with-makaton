@@ -35,6 +35,14 @@ Deno.serve(async (req) => {
     });
   }
 
+  const orgCheck = await requireOrgMember(supabase, claims.claims.sub as string);
+  if (!orgCheck.ok) {
+    return new Response(JSON.stringify(orgCheck.body), {
+      status: orgCheck.status,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const API_TOKEN = Deno.env.get("CODEWORDS_API_TOKEN");
   if (!API_TOKEN) {
     return new Response(JSON.stringify({ error: "Server config error" }), {
