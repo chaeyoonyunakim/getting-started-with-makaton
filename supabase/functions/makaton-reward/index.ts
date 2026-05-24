@@ -35,6 +35,14 @@ Deno.serve(async (req) => {
     });
   }
 
+  const orgCheck = await requireOrgMember(supabase, claims.claims.sub as string);
+  if (!orgCheck.ok) {
+    return new Response(JSON.stringify(orgCheck.body), {
+      status: orgCheck.status,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) {
     return new Response(JSON.stringify({ error: "Server config error: missing API key" }), {
