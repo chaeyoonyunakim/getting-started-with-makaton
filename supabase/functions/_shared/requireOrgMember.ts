@@ -6,6 +6,7 @@
 const DEFAULT_ORG_SENTINEL = "00000000-0000-0000-0000-000000000001";
 
 // deno-lint-ignore no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function requireOrgMember(supabase: any, userId: string): Promise<
   { ok: true; orgId: string } | { ok: false; status: number; body: Record<string, unknown> }
 > {
