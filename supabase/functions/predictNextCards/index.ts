@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
 
   try {
     const auth = req.headers.get("Authorization");
-    if (!auth) {
+    if (!auth?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "missing auth" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
