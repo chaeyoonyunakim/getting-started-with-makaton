@@ -15,8 +15,22 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   try {
     const auth = req.headers.get("Authorization");
-    if (!auth) {
+    if (!auth?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "missing auth" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const _authClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: auth } } },
+    );
+    const { data: claims, error: claimsErr } = await _authClient.auth.getClaims(
+      auth.replace("Bearer ", ""),
+    );
+    if (claimsErr || !claims?.claims?.sub) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

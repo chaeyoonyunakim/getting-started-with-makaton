@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
 
   try {
     const auth = req.headers.get("Authorization");
-    if (!auth) {
+    if (!auth?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "missing auth" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -56,6 +56,15 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_ANON_KEY")!,
       { global: { headers: { Authorization: auth } } },
     );
+    const { data: claims, error: claimsErr } = await userClient.auth.getClaims(
+      auth.replace("Bearer ", ""),
+    );
+    if (claimsErr || !claims?.claims?.sub) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     // Service client for the materialised view (revoked from API roles).
     const adminClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
