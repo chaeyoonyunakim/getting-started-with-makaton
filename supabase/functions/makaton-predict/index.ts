@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { sanitizePromptInput } from "../_shared/sanitizePromptInput.ts";
+import { requireOrgMember } from "../_shared/requireOrgMember.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
