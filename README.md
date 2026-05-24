@@ -25,7 +25,7 @@ retention, sub-processors, and how to handle Subject Access Requests
   bandit running inside the `predictNextCards` Edge Function. **No
   external LLM is called at runtime.** Nightly bandit update via
   `updateBanditNightly`.
-- **Symbol sourcing**: Local cache (`/public/symbols/`) first; on 404
+- **Symbol sourcing**: Local cache (`/assets/symbols/`) first; on 404
   `BoardCell` calls the `resolveSymbol` edge function: ARASAAC REST API
   → Mulberry CDN → Sclera (high-contrast) → optional AI synthesis (off
   by default). See **Symbol licensing** below.
@@ -53,7 +53,7 @@ retention, sub-processors, and how to handle Subject Access Requests
 ## Symbol licensing
 
 Open-licensed symbols (ARASAAC CC BY-NC-SA 4.0) are shipped locally
-under `/public/symbols/` for instant first render. Proprietary symbol
+under `/assets/symbols/` for instant first render. Proprietary symbol
 sets are never embedded. For any label without a local file, `BoardCell`
 calls the `resolveSymbol` edge function, which fetches and caches the
 best available alternative, storing source, licence, and attribution on

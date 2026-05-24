@@ -3,7 +3,7 @@ import { Category } from "@/types/choiceBoard";
 /**
  * Makaton choice board data.
  *
- * Images are stored locally under /public/symbols/[name].png.
+ * Images are stored locally under /assets/symbols/[name].png.
  * If an image isn't available yet BoardCell calls resolveSymbol (ARASAAC → Mulberry → Sclera).
  */
 
