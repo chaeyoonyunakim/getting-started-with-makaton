@@ -3,11 +3,14 @@
 // (org_id NULL or the seeded "Default Org" sentinel) to prevent
 // self-registered accounts from draining paid AI credits.
 
+import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+
 const DEFAULT_ORG_SENTINEL = "00000000-0000-0000-0000-000000000001";
 
-// deno-lint-ignore no-explicit-any
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function requireOrgMember(supabase: any, userId: string): Promise<
+export async function requireOrgMember(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<
   { ok: true; orgId: string } | { ok: false; status: number; body: Record<string, unknown> }
 > {
   const { data, error } = await supabase
@@ -21,7 +24,7 @@ export async function requireOrgMember(supabase: any, userId: string): Promise<
     return { ok: false, status: 500, body: { error: "Profile lookup failed" } };
   }
 
-  const orgId = data?.org_id as string | null | undefined;
+  const orgId = (data as { org_id?: string | null } | null)?.org_id;
   if (!orgId || orgId === DEFAULT_ORG_SENTINEL) {
     return {
       ok: false,
