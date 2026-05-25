@@ -12,7 +12,7 @@ a short-term assistant work at a SEND school in London, 2022; each card
 showing a symbol on the front and its hand sign on the back, used for
 everyday communication with pupils who had limited verbal speech.
 
-![Physical AAC pocket cards used in the classroom](assets/pocket-cards.png)
+![Physical AAC pocket cards used in the pilot classroom](assets/pocket-cards.png)
 
 This README focuses on **pilot-readiness**: architecture, lawful basis,
 retention, sub-processors, and how to handle Subject Access Requests
