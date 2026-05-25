@@ -1,6 +1,6 @@
 [![status: experimental](https://github.com/GIScience/badges/raw/master/status/experimental.svg)](https://github.com/GIScience/badges#experimental)
 
-# The Makaton — UK SEND Pilot
+# The Choice Board
 
 A digital choice board for non-verbal and emerging-verbal pupils in UK
 SEN schools. Built mobile-first and tablet-optimised (iPad 10.2"
@@ -13,10 +13,6 @@ showing a symbol on the front and its hand sign on the back, used for
 everyday communication with pupils who had limited verbal speech.
 
 ![Physical AAC pocket cards used in the pilot classroom](assets/pocket-cards.png)
-
-This README focuses on **pilot-readiness**: architecture, lawful basis,
-retention, sub-processors, and how to handle Subject Access Requests
-(SARs) and Right-to-Erasure requests.
 
 ---
 
